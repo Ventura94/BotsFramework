@@ -7,7 +7,7 @@ import time
 
 import MetaTrader5
 from MetaTrader5 import TradePosition
-from setting import STRATEGY_DIR
+from setting import STRATEGY_DIR, TYPE_FILLING
 from exceptions.MetaTraderError import InitializeError, TypeOrderError
 
 
@@ -70,7 +70,7 @@ class Controller:
             "magic": self.conf['magic'],
             "comment": self.conf['comment'],
             "type_time": MetaTrader5.ORDER_TIME_GTC,
-            "type_filling": MetaTrader5.ORDER_FILLING_RETURN,
+            "type_filling": TYPE_FILLING,
         }
         return request
 
@@ -124,7 +124,6 @@ class Controller:
         if positions:
             results: list = []
             for position in positions:
-                print(position)
                 request = self.prepare_to_close_positions(position)
                 results.append(self.send_to_metatrader(request))
             return f"Report close order: {results}"

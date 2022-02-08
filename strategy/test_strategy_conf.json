@@ -1,8 +1,8 @@
 {
-  "symbol": "BTCUSD",
+  "symbol": "USDCAD",
   "account": 5619236,
   "volume": 0.01,
   "deviation": 20,
   "magic": 123456,
-  "comment": "V3N2R4 python script"
+  "comment": "V3N2R4"
 }

@@ -21,7 +21,7 @@ class ControllerTest(unittest.TestCase):
         Check that the strategy configuration file is loaded correctly.
         """
 
-        self.assertEqual(self.controller.conf['symbol'], "BTCUSD")
+        self.assertEqual(self.controller.conf['symbol'], "USDCAD")
         self.assertEqual(self.controller.conf['account'], 5619236)
         self.assertEqual(self.controller.conf['volume'], 0.01)
         self.assertEqual(self.controller.conf['deviation'], 20)
@@ -90,10 +90,20 @@ class ControllerTest(unittest.TestCase):
         ...
 
     def test_close_all_symbol_positions(self):
+        self.controller.open_market_positions("buy")
+        self.controller.open_market_positions("buy")
+        self.controller.open_market_positions("buy")
         self.assertEqual(
             self.controller.close_all_symbol_positions()[:19],
             "Report close order:"
         )
+
+    def tearDown(self):
+        positions: tuple = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+            symbol=self.controller.conf['symbol']
+        )
+        if positions:
+            self.controller.close_all_symbol_positions()
 
 
 if __name__ == '__main__':
