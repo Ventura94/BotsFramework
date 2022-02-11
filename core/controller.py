@@ -4,7 +4,6 @@
 import json
 import os
 import time
-
 import MetaTrader5
 from MetaTrader5 import TradePosition
 from setting import STRATEGY_DIR, TYPE_FILLING
