@@ -1,10 +1,9 @@
 """
 This module contains the bot settings
 """
-
+import unittest
 import os
 import MetaTrader5
-
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 

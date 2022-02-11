@@ -5,7 +5,6 @@ This Module contains MetaTraderBot custom errors.
 
 class Error(Exception):
     """Base class for exceptions in this module."""
-    pass
 
 
 class InitializeError(Error):
@@ -15,6 +14,7 @@ class InitializeError(Error):
     """
 
     def __init__(self, message: str) -> None:
+        super().__init__()
         self.message = message
 
 
@@ -25,4 +25,5 @@ class TypeOrderError(Error):
     """
 
     def __init__(self, message: str) -> None:
+        super().__init__()
         self.message = message

@@ -3,11 +3,11 @@
 """
 import json
 import os
-import time
+
 import MetaTrader5
-from MetaTrader5 import TradePosition
+from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
 from setting import STRATEGY_DIR, TYPE_FILLING
-from exceptions.MetaTraderError import InitializeError, TypeOrderError
+from exceptions.meta_trader_errors import InitializeError, TypeOrderError
 
 
 class Controller:
@@ -46,19 +46,19 @@ class Controller:
         :raise TypeOrderError: Fired when an unaccepted order type is submitted.
         :return: Dictionary with the configuration of the command to be opened.
         """
-        type_order = type_order.lower()
-        if type_order == "buy":
-            order = MetaTrader5.ORDER_TYPE_BUY
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+        if type_order.lower() == "buy":
+            order: int = MetaTrader5.ORDER_TYPE_BUY
+            price: float = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
                 self.conf['symbol']
             ).ask
-        elif type_order == "sell":
-            order = MetaTrader5.ORDER_TYPE_SELL
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+        elif type_order.lower() == "sell":
+            order: int = MetaTrader5.ORDER_TYPE_SELL
+            price: float = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
                 self.conf['symbol']
             ).bid
         else:
-            raise TypeOrderError('The type of order sent is not accepted, it must be "buy" or "sell"')
+            raise TypeOrderError(
+                'The type of order sent is not accepted, it must be "buy" or "sell"')
         request: dict = {
             "action": MetaTrader5.TRADE_ACTION_DEAL,
             "symbol": self.conf['symbol'],
@@ -75,9 +75,10 @@ class Controller:
 
     def open_market_positions(self, type_order: str) -> str:
         """
+        Open a position at market price.
 
         :param type_order: Type of order to be placed, accepts only "buy" or "sell".
-        :return:
+        :return: String with the result of sending the order to MetaTrader5.
         """
         request = self.prepare_to_open_positions(type_order)
         return self.send_to_metatrader(request)
@@ -85,9 +86,10 @@ class Controller:
     @staticmethod
     def prepare_to_close_positions(position: TradePosition) -> dict:
         """
+        Method that forms the dictionary with which to close position.
 
-        :param position:
-        :return:
+        :param position: Position to close
+        :return: Dictionary with the configuration of the command to be opened.
         """
         symbol: str = position.symbol
         type_order: int = position.type
@@ -126,6 +128,7 @@ class Controller:
                 request = self.prepare_to_close_positions(position)
                 results.append(self.send_to_metatrader(request))
             return f"Report close order: {results}"
+        return f"There are no {self.conf['symbol']} positions to close"
 
     @staticmethod
     def send_to_metatrader(request: dict) -> str:
@@ -135,10 +138,10 @@ class Controller:
         :param dict request: Request data to metatrader.
         """
         count: int = 0
-        result: str = ""
+        result: OrderSendResult = None
         while count < 3:
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
-                return "The order was placed successfully."
+                return result.comment
             count += 1
-        return f'Error placing the order. Result: {result}'
+        return result.comment
