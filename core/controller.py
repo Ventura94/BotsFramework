@@ -18,7 +18,7 @@ class Controller:
     """
 
     def __init__(self, strategy_conf_file: str) -> None:
-        self.conf: dict = self.conf_load_file(strategy_conf_file)
+        self.conf = self.conf_load_file(strategy_conf_file)
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeError("Error launching MetaTrader")
@@ -35,7 +35,7 @@ class Controller:
             STRATEGY_DIR, strategy_conf_file
         )
         with open(conf_path) as json_file:
-            data: dict = json.load(json_file)
+            data = json.load(json_file)
             return data
 
     def prepare_to_open_positions(self, type_order: str) -> dict:
@@ -47,27 +47,27 @@ class Controller:
         :return: Dictionary with the configuration of the command to be opened.
         """
         if type_order.lower() == "buy":
-            order: int = MetaTrader5.ORDER_TYPE_BUY
-            price: float = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf['symbol']
+            order = MetaTrader5.ORDER_TYPE_BUY
+            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                self.conf.get('symbol')
             ).ask
         elif type_order.lower() == "sell":
-            order: int = MetaTrader5.ORDER_TYPE_SELL
-            price: float = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf['symbol']
+            order = MetaTrader5.ORDER_TYPE_SELL
+            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                self.conf.get('symbol')
             ).bid
         else:
             raise TypeOrderError(
                 'The type of order sent is not accepted, it must be "buy" or "sell"')
-        request: dict = {
+        request = {
             "action": MetaTrader5.TRADE_ACTION_DEAL,
-            "symbol": self.conf['symbol'],
-            "volume": self.conf['volume'],
+            "symbol": self.conf.get('symbol'),
+            "volume": self.conf.get('volume'),
             "type": order,
             "price": price,
-            "deviation": self.conf['deviation'],
-            "magic": self.conf['magic'],
-            "comment": self.conf['comment'],
+            "deviation": self.conf.get('deviation'),
+            "magic": self.conf.get('magic'),
+            "comment": self.conf.get('comment'),
             "type_time": MetaTrader5.ORDER_TIME_GTC,
             "type_filling": TYPE_FILLING,
         }
@@ -91,17 +91,17 @@ class Controller:
         :param position: Position to close
         :return: Dictionary with the configuration of the command to be opened.
         """
-        symbol: str = position.symbol
-        type_order: int = position.type
-        ticket: int = position.ticket
-        volume: float = position.volume
+        symbol = position.symbol
+        type_order = position.type
+        ticket = position.ticket
+        volume = position.volume
         if type_order == MetaTrader5.ORDER_TYPE_BUY:
-            order_type: int = MetaTrader5.ORDER_TYPE_SELL
+            order_type = MetaTrader5.ORDER_TYPE_SELL
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
                 symbol
             ).bid
         else:
-            order_type: int = MetaTrader5.ORDER_TYPE_BUY
+            order_type = MetaTrader5.ORDER_TYPE_BUY
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
                 symbol
             ).ask
@@ -119,16 +119,16 @@ class Controller:
         """
         Close all positions of a symbol.
         """
-        positions: tuple = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.conf['symbol']
+        positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+            symbol=self.conf.get['symbol']
         )
         if positions:
-            results: list = []
+            results = []
             for position in positions:
                 request = self.prepare_to_close_positions(position)
                 results.append(self.send_to_metatrader(request))
             return f"Report close order: {results}"
-        return f"There are no {self.conf['symbol']} positions to close"
+        return f"There are no {self.conf.get('symbol')} positions to close"
 
     @staticmethod
     def send_to_metatrader(request: dict) -> str:
@@ -137,7 +137,7 @@ class Controller:
 
         :param dict request: Request data to metatrader.
         """
-        count: int = 0
+        count = 0
         result: OrderSendResult = None
         while count < 3:
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member

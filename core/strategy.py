@@ -18,7 +18,7 @@ class Strategy(ABC):
 
     @abstractmethod
     def strategy_bot(self):
-        data = self.get_data()  # pylint: disable=unused-argument
+        return self.get_data()  # pylint: disable=unused-argument
 
     def start(self):
         while True:
