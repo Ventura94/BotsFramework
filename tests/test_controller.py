@@ -13,6 +13,15 @@ class ControllerTest(unittest.TestCase):
     def setUp(self):
         strategy_conf_file = 'test_strategy_conf.json'
         self.controller = Controller(strategy_conf_file=strategy_conf_file)
+        self.controller_not_config = Controller()
+        self.dict_conf = dict(
+            symbol="USDCAD",
+            account=5619236,
+            volume=0.01,
+            deviation=20,
+            magic=123456,
+            comment="V3N2R4",
+        )
 
     def test_load_config(self):
         """
@@ -57,6 +66,16 @@ class ControllerTest(unittest.TestCase):
             "anything but a kind of position",
         )
 
+    def test_open_market_positions_not_conf(self):
+        self.assertEqual(
+            self.controller_not_config.open_market_positions(type_order="buy", **self.dict_conf),
+            "Request executed"
+        )
+        self.assertEqual(
+            self.controller_not_config.open_market_positions(type_order="sell", **self.dict_conf),
+            "Request executed"
+        )
+
     def test_prepare_to_close_positions(self):
         self.controller.open_market_positions("buy")
         positions: tuple = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
@@ -89,6 +108,5 @@ class ControllerTest(unittest.TestCase):
         if positions:
             self.controller.close_all_symbol_positions()
 
-
-if __name__ == '__main__':
-    unittest.main()
+    if __name__ == '__main__':
+        unittest.main()

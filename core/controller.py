@@ -17,20 +17,22 @@ class Controller:
     :param strategy_conf_file: String with the name of the strategy configuration file.
     """
 
-    def __init__(self, strategy_conf_file: str) -> None:
+    def __init__(self, strategy_conf_file: str = None) -> None:
         self.conf = self.conf_load_file(strategy_conf_file)
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeError("Error launching MetaTrader")
 
     @staticmethod
-    def conf_load_file(strategy_conf_file: str) -> dict:
+    def conf_load_file(strategy_conf_file: str = None) -> dict:
         """
         Load the bot strategy configuration.
 
         :param strategy_conf_file: String with the name of the strategy configuration file.
         :return: Dictionary with the content of the strategy configuration.
         """
+        if not strategy_conf_file:
+            return dict()
         conf_path = os.path.join(
             STRATEGY_DIR, strategy_conf_file
         )
@@ -46,6 +48,7 @@ class Controller:
         :raise TypeOrderError: Fired when an unaccepted order type is submitted.
         :return: Dictionary with the configuration of the command to be opened.
         """
+
         if type_order.lower() == "buy":
             order = MetaTrader5.ORDER_TYPE_BUY
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
@@ -73,13 +76,16 @@ class Controller:
         }
         return request
 
-    def open_market_positions(self, type_order: str) -> str:
+    def open_market_positions(self, type_order: str, **kwargs) -> str:
         """
         Open a position at market price.
 
         :param type_order: Type of order to be placed, accepts only "buy" or "sell".
+        :param kwargs: Configuration this order.
         :return: String with the result of sending the order to MetaTrader5.
         """
+
+        self.conf.update(kwargs)
         request = self.prepare_to_open_positions(type_order)
         return self.send_to_metatrader(request)
 
@@ -120,7 +126,7 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.conf.get['symbol']
+            symbol=self.conf.get('symbol')
         )
         if positions:
             results = []

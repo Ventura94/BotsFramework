@@ -13,13 +13,28 @@ class Strategy(ABC):
         ...
 
     @abstractmethod
-    def get_data(self):
+    def get_data(self) -> dict:
+        """
+        In this method, a dictionary with the clean data necessary to establish the strategy is returned.
+
+        :return: Dictionary with the necessary data for the strategy.
+        """
         pass
 
     @abstractmethod
-    def strategy_bot(self):
-        return self.get_data()  # pylint: disable=unused-argument
+    def strategy_bot(self) -> None:
+        """
+        In this method the strategy is implemented.
 
-    def start(self):
+        :return: None
+        """
+        data = self.get_data()  # pylint: disable=unused-argument
+
+    def start(self) -> None:
+        """
+        This is the method in charge of constantly implementing the strategy,
+        it does not need to be overridden, it is only called in the main bot.
+        :return:
+        """
         while True:
             self.strategy_bot()
