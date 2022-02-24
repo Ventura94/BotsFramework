@@ -17,6 +17,8 @@ class Controller:
     :param strategy_conf_file: String with the name of the strategy configuration file.
     """
 
+    last_ticket = 0
+
     def __init__(self, strategy_conf_file: str = None) -> None:
         self.conf = self.conf_load_file(strategy_conf_file)
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
@@ -121,6 +123,20 @@ class Controller:
         }
         return request
 
+    def close_positions_by_ticket(self, ticket: int) -> str:
+        """
+        Close a position for your ticket.
+
+        :return: Closing result.
+        """
+        position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+            ticket=ticket
+        )
+        if position:
+            request = self.prepare_to_close_positions(position)
+            return self.send_to_metatrader(request)
+        return f"There are no positions to close"
+
     def close_all_symbol_positions(self, **kwargs) -> str:
         """
         Close all positions of a symbol.
@@ -137,8 +153,7 @@ class Controller:
             return f"Report close order: {results}"
         return f"There are no {self.conf.get('symbol')} positions to close"
 
-    @staticmethod
-    def send_to_metatrader(request: dict) -> str:
+    def send_to_metatrader(self, request: dict) -> str:
         """
         Send order to metatrader.
 
@@ -149,6 +164,7 @@ class Controller:
         while count < 3:
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
+                self.last_ticket = result.order
                 return result.comment
             count += 1
         return result.comment
