@@ -24,7 +24,6 @@ class TelegramCopy(ABC):
         :param message: Telegram message
         :return: Dictionary with the necessary parameters for a command
         """
-        pass
 
     @abstractmethod
     def send_order(self, message: str) -> str:
@@ -36,4 +35,3 @@ class TelegramCopy(ABC):
 
         :param str message: Telegram message.
         """
-        pass

@@ -34,7 +34,7 @@ class Controller:
         :return: Dictionary with the content of the strategy configuration.
         """
         if not strategy_conf_file:
-            return dict()
+            return {}
         conf_path = os.path.join(STRATEGY_DIR, strategy_conf_file)
         with open(conf_path) as json_file:
             data = json.load(json_file)
@@ -134,7 +134,7 @@ class Controller:
         if position:
             request = self.prepare_to_close_positions(position)
             return self.send_to_metatrader(request)
-        return f"There are no positions to close"
+        return "There are no positions to close"
 
     def close_all_symbol_positions(self, **kwargs) -> str:
         """
@@ -159,7 +159,7 @@ class Controller:
         :param dict request: Request data to metatrader.
         """
         count = 0
-        result: OrderSendResult = None
+        result = None
         while count < 3:
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:

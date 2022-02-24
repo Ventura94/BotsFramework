@@ -5,10 +5,13 @@ import unittest
 import MetaTrader5
 from core.controller import Controller
 from exceptions.meta_trader_errors import TypeOrderError
-from setting import TYPE_FILLING
 
 
 class ControllerTest(unittest.TestCase):
+    """
+    Test Controller module.
+    """
+
     def setUp(self):
         strategy_conf_file = "test_strategy_conf.json"
         self.controller = Controller(strategy_conf_file=strategy_conf_file)
@@ -34,6 +37,9 @@ class ControllerTest(unittest.TestCase):
         self.assertEqual(self.controller.conf.get("comment"), "V3N2R4")
 
     def test_prepare_to_open_positions(self):
+        """
+        Test prepare to open positions.
+        """
         buy = self.controller.prepare_to_open_positions("buy")
         self.assertEqual(buy["type"], MetaTrader5.ORDER_TYPE_BUY)
         sell = self.controller.prepare_to_open_positions("sell")
@@ -45,6 +51,9 @@ class ControllerTest(unittest.TestCase):
         )
 
     def test_open_market_positions(self):
+        """
+        Test open market positions.
+        """
         self.assertEqual(
             self.controller.open_market_positions("buy"), "Request executed"
         )
@@ -58,6 +67,9 @@ class ControllerTest(unittest.TestCase):
         )
 
     def test_open_market_positions_not_conf(self):
+        """
+        Test open market position(not configuration file)
+        """
         self.assertEqual(
             self.controller_not_config.open_market_positions(
                 type_order="buy", **self.dict_conf
@@ -72,6 +84,9 @@ class ControllerTest(unittest.TestCase):
         )
 
     def test_prepare_to_close_positions(self):
+        """
+        Test prepare to close positions.
+        """
         self.controller.open_market_positions("buy")
         positions: tuple = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             symbol=self.controller.conf.get("symbol")
@@ -81,6 +96,9 @@ class ControllerTest(unittest.TestCase):
             self.assertNotEqual(position.type, result.get("type"))
 
     def test_close_all_symbol_positions(self):
+        """
+         Test close all symbol for positions.
+        """
         self.controller.open_market_positions("buy")
         self.controller.open_market_positions("buy")
         self.controller.open_market_positions("buy")

@@ -1,7 +1,7 @@
 """
 This module contains the bot settings
 """
-import unittest
+
 import os
 import MetaTrader5
 

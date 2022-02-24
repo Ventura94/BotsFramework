@@ -12,11 +12,12 @@ class BotTest(Strategy):
     """
     conf_file: str = "test_strategy_conf.json"
 
-    def get_data(self) -> dict:
+    @staticmethod
+    def get_data() -> dict:
         return {"low": 10.0, "close": 20}
 
     def strategy_bot(self) -> None:
-        super().strategy_bot()
+        pass
 
 
 class StrategyTest(unittest.TestCase):
