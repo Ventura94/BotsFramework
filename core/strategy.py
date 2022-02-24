@@ -3,7 +3,6 @@ from core.controller import Controller
 
 
 class Strategy(ABC):
-
     def __init__(self):
         self.controller = Controller(self.conf_file)
 

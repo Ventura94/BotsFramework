@@ -1,18 +1,28 @@
+"""
+Test strategy module
+"""
+
 import unittest
 from core.strategy import Strategy
 
 
 class BotTest(Strategy):
+    """
+    Bot test.
+    """
     conf_file: str = "test_strategy_conf.json"
 
-    def get_data(self):
-        return {'low': 10.0, 'close': 20}
+    def get_data(self) -> dict:
+        return {"low": 10.0, "close": 20}
 
-    def strategy_bot(self):
-        data = super(BotTest, self).strategy_bot()
+    def strategy_bot(self) -> None:
+        super().strategy_bot()
 
 
 class StrategyTest(unittest.TestCase):
+    """
+    Test Strategy
+    """
 
     def setUp(self):
         self.bot = BotTest()
@@ -22,13 +32,13 @@ class StrategyTest(unittest.TestCase):
         """
         Check that the strategy configuration file is loaded correctly.
         """
-        self.assertEqual(self.bot.controller.conf.get('symbol'), "USDCAD")
-        self.assertEqual(self.bot.controller.conf.get('account'), 5619236)
-        self.assertEqual(self.bot.controller.conf.get('volume'), 0.01)
-        self.assertEqual(self.bot.controller.conf.get('deviation'), 20)
-        self.assertEqual(self.bot.controller.conf.get('magic'), 123456)
-        self.assertEqual(self.bot.controller.conf.get('comment'), "V3N2R4")
+        self.assertEqual(self.bot.controller.conf.get("symbol"), "USDCAD")
+        self.assertEqual(self.bot.controller.conf.get("account"), 5619236)
+        self.assertEqual(self.bot.controller.conf.get("volume"), 0.01)
+        self.assertEqual(self.bot.controller.conf.get("deviation"), 20)
+        self.assertEqual(self.bot.controller.conf.get("magic"), 123456)
+        self.assertEqual(self.bot.controller.conf.get("comment"), "V3N2R4")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

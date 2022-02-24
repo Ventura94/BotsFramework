@@ -35,9 +35,7 @@ class Controller:
         """
         if not strategy_conf_file:
             return dict()
-        conf_path = os.path.join(
-            STRATEGY_DIR, strategy_conf_file
-        )
+        conf_path = os.path.join(STRATEGY_DIR, strategy_conf_file)
         with open(conf_path) as json_file:
             data = json.load(json_file)
             return data
@@ -54,25 +52,26 @@ class Controller:
         if type_order.lower() == "buy":
             order = MetaTrader5.ORDER_TYPE_BUY
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf.get('symbol')
+                self.conf.get("symbol")
             ).ask
         elif type_order.lower() == "sell":
             order = MetaTrader5.ORDER_TYPE_SELL
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf.get('symbol')
+                self.conf.get("symbol")
             ).bid
         else:
             raise TypeOrderError(
-                'The type of order sent is not accepted, it must be "buy" or "sell"')
+                'The type of order sent is not accepted, it must be "buy" or "sell"'
+            )
         request = {
             "action": MetaTrader5.TRADE_ACTION_DEAL,
-            "symbol": self.conf.get('symbol'),
-            "volume": self.conf.get('volume', 0.01),
+            "symbol": self.conf.get("symbol"),
+            "volume": self.conf.get("volume", 0.01),
             "type": order,
             "price": price,
-            "deviation": self.conf.get('deviation', 20),
-            "magic": self.conf.get('magic', 0),
-            "comment": self.conf.get('comment', "V3N2R4"),
+            "deviation": self.conf.get("deviation", 20),
+            "magic": self.conf.get("magic", 0),
+            "comment": self.conf.get("comment", "V3N2R4"),
             "type_time": MetaTrader5.ORDER_TIME_GTC,
             "type_filling": TYPE_FILLING,
         }
@@ -143,7 +142,7 @@ class Controller:
         """
         self.conf.update(kwargs)
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.conf.get('symbol')
+            symbol=self.conf.get("symbol")
         )
         if positions:
             results = []

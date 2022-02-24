@@ -1,8 +1,15 @@
+"""
+This module performs copy trading with telegram messages.
+"""
+
 from abc import ABC, abstractmethod
 from .controller import Controller
 
 
 class TelegramCopy(ABC):
+    """
+    Bot Telegram copy trading.
+    """
 
     def __init__(self):
         self.controller = Controller()
