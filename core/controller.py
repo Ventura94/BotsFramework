@@ -6,8 +6,8 @@ import os
 
 import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
-from setting import STRATEGY_DIR, TYPE_FILLING
-from exceptions.meta_trader_errors import InitializeError, TypeOrderError
+from ..setting import STRATEGY_DIR, TYPE_FILLING
+from ..exceptions.meta_trader_errors import InitializeError, TypeOrderError
 
 
 class Controller:
@@ -65,12 +65,12 @@ class Controller:
         request = {
             "action": MetaTrader5.TRADE_ACTION_DEAL,
             "symbol": self.conf.get('symbol'),
-            "volume": self.conf.get('volume'),
+            "volume": self.conf.get('volume', 0.01),
             "type": order,
             "price": price,
-            "deviation": self.conf.get('deviation'),
-            "magic": self.conf.get('magic'),
-            "comment": self.conf.get('comment'),
+            "deviation": self.conf.get('deviation', 20),
+            "magic": self.conf.get('magic', 0),
+            "comment": self.conf.get('comment', "V3N2R4"),
             "type_time": MetaTrader5.ORDER_TIME_GTC,
             "type_filling": TYPE_FILLING,
         }
@@ -121,10 +121,11 @@ class Controller:
         }
         return request
 
-    def close_all_symbol_positions(self) -> str:
+    def close_all_symbol_positions(self, **kwargs) -> str:
         """
         Close all positions of a symbol.
         """
+        self.conf.update(kwargs)
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             symbol=self.conf.get('symbol')
         )

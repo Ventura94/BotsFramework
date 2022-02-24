@@ -19,7 +19,6 @@ class Strategy(ABC):
 
         :return: Dictionary with the necessary data for the strategy.
         """
-        pass
 
     @abstractmethod
     def strategy_bot(self) -> None:
@@ -28,7 +27,6 @@ class Strategy(ABC):
 
         :return: None
         """
-        data = self.get_data()  # pylint: disable=unused-argument
 
     def start(self) -> None:
         """
