@@ -3,7 +3,7 @@ Strategy Module. Contain the abstract class Strategy, to implement strategy bots
 """
 
 from abc import ABC, abstractmethod
-from core.controller import Controller
+from MT5BotFramework.core.controller import Controller
 
 
 class Strategy(ABC):
