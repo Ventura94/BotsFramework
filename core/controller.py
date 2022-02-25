@@ -6,8 +6,8 @@ import os
 
 import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
-from ..setting import STRATEGY_DIR, TYPE_FILLING
-from ..exceptions.meta_trader_errors import InitializeError, TypeOrderError
+from MT5BotFramework.setting import STRATEGY_DIR, TYPE_FILLING
+from MT5BotFramework.exceptions.meta_trader_errors import InitializeError, TypeOrderError
 
 
 class Controller:
@@ -36,7 +36,7 @@ class Controller:
         if not strategy_conf_file:
             return {}
         conf_path = os.path.join(STRATEGY_DIR, strategy_conf_file)
-        with open(conf_path) as json_file:
+        with open(conf_path, encoding="utf8") as json_file:
             data = json.load(json_file)
             return data
 

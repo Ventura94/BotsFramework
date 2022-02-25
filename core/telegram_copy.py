@@ -25,7 +25,6 @@ class TelegramCopyProvider(ABC):
         :return: Dictionary with the necessary parameters for a command
         """
 
-    @abstractmethod
     def send_order(self, message: str) -> str:
         """
         Method in charge of sending the positions to MetaTrader 5.
@@ -34,4 +33,18 @@ class TelegramCopyProvider(ABC):
         automatically takes care of cleaning it with the message_to_order() method.
 
         :param str message: Telegram message.
+        """
+        try:
+            order = self.message_to_order(message)
+        except ValueError as error:
+            return f"{error}"
+        return self.order(order)
+
+    @abstractmethod
+    def order(self, order: dict) -> str:
+        """
+        This method is to define the logic of the bot.
+
+        :param order: Order dict.
+        :return: Order result.
         """
