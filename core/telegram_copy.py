@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from .controller import Controller
 
 
-class TelegramCopy(ABC):
+class TelegramCopyProvider(ABC):
     """
     Bot Telegram copy trading.
     """
