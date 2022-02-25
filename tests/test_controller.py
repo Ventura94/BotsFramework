@@ -3,8 +3,8 @@ Bot test module.
 """
 import unittest
 import MetaTrader5
-from core.controller import Controller
-from exceptions.meta_trader_errors import TypeOrderError
+from MT5BotFramework.core.controller import Controller
+from MT5BotFramework.exceptions.meta_trader_errors import TypeOrderError
 
 
 class ControllerTest(unittest.TestCase):

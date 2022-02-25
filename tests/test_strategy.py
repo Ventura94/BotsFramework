@@ -3,7 +3,7 @@ Test strategy module
 """
 
 import unittest
-from core.strategy import Strategy
+from MT5BotFramework.core.strategy import Strategy
 
 
 class BotTest(Strategy):
