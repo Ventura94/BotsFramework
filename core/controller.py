@@ -48,6 +48,8 @@ class Controller:
         :raise TypeOrderError: Fired when an unaccepted order type is submitted.
         :return: Dictionary with the configuration of the command to be opened.
         """
+        if self.conf.get('custom_lot', False):
+            self.conf["volume"] = self.lot()
 
         if type_order.lower() == "buy":
             order = MetaTrader5.ORDER_TYPE_BUY
@@ -168,3 +170,12 @@ class Controller:
                 return result.comment
             count += 1
         return result.comment
+
+    @staticmethod
+    def lot() -> float:
+        balance = MetaTrader5.account_info().balance
+        if balance > 40:
+            result = (balance / 40) / 100
+        else:
+            result = 0.01
+        return float(decimal.Decimal(result).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN))
