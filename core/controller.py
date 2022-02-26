@@ -8,6 +8,7 @@ import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
 from MT5BotFramework.setting import STRATEGY_DIR, TYPE_FILLING
 from MT5BotFramework.exceptions.meta_trader_errors import InitializeError, TypeOrderError
+import decimal
 
 
 class Controller:
