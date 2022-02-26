@@ -4,6 +4,7 @@ This module performs copy trading with telegram messages.
 
 from abc import ABC, abstractmethod
 from MT5BotFramework.core.controller import Controller
+from MT5BotFramework.exceptions.meta_trader_errors import AuthorizedError
 
 
 class TelegramCopyProvider(ABC):
@@ -37,6 +38,10 @@ class TelegramCopyProvider(ABC):
         try:
             order = self.message_to_order(message)
         except ValueError as error:
+            return f"{error}"
+        except Warning as error:
+            return f"{error}"
+        except KeyError as error:
             return f"{error}"
         return self.order(order)
 

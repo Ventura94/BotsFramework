@@ -23,7 +23,7 @@ class Controller:
         self.conf = self.conf_load_file(strategy_conf_file)
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise InitializeError("Error launching MetaTrader")
+            raise Warning("Error launching MetaTrader")
 
     @staticmethod
     def conf_load_file(strategy_conf_file: str = None) -> dict:
@@ -128,12 +128,13 @@ class Controller:
 
         :return: Closing result.
         """
-        position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+        positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             ticket=ticket
         )
-        if position:
-            request = self.prepare_to_close_positions(position)
-            return self.send_to_metatrader(request)
+        if positions:
+            for position in positions:
+                request = self.prepare_to_close_positions(position)
+                return self.send_to_metatrader(request)
         return "There are no positions to close"
 
     def close_all_symbol_positions(self, **kwargs) -> str:
