@@ -97,7 +97,7 @@ class ControllerTest(unittest.TestCase):
 
     def test_close_all_symbol_positions(self):
         """
-         Test close all symbol for positions.
+        Test close all symbol for positions.
         """
         self.controller.open_market_positions("buy")
         self.controller.open_market_positions("buy")

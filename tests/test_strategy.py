@@ -10,6 +10,7 @@ class BotTest(Strategy):
     """
     Bot test.
     """
+
     conf_file: str = "test_strategy_conf.json"
 
     @staticmethod

@@ -7,7 +7,10 @@ import os
 import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
 from MT5BotFramework.setting import STRATEGY_DIR, TYPE_FILLING
-from MT5BotFramework.exceptions.meta_trader_errors import InitializeError, TypeOrderError
+from MT5BotFramework.exceptions.meta_trader_errors import (
+    InitializeError,
+    TypeOrderError,
+)
 import decimal
 
 
@@ -49,7 +52,7 @@ class Controller:
         :raise TypeOrderError: Fired when an unaccepted order type is submitted.
         :return: Dictionary with the configuration of the command to be opened.
         """
-        if self.conf.get('custom_lot', False):
+        if self.conf.get("custom_lot", False):
             self.conf["volume"] = self.lot()
 
         if type_order.lower() == "buy":
@@ -179,4 +182,8 @@ class Controller:
             result = (balance / 40) / 100
         else:
             result = 0.01
-        return float(decimal.Decimal(result).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN))
+        return float(
+            decimal.Decimal(result).quantize(
+                decimal.Decimal(".01"), rounding=decimal.ROUND_DOWN
+            )
+        )
