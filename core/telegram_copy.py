@@ -48,7 +48,7 @@ class TelegramCopyProvider(ABC):
             order = self.message_to_order(message)
         except ValueError as error:
             return f"{error}"
-        except Warning as error:
+        except AuthorizedError as error:
             return f"{error}"
         except KeyError as error:
             return f"{error}"
