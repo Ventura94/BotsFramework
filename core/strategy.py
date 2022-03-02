@@ -12,13 +12,14 @@ class Strategy(ABC):
     """
 
     def __init__(self):
-        self.controller = Controller(self.conf_file)
+        self.controller = Controller()
+        self.controller.conf = self.conf
 
     @property
     @abstractmethod
-    def conf_file(self) -> str:
+    def conf(self) -> dict:
         """
-        Property to load configuration file
+        Property to load configuration
         """
         ...
 

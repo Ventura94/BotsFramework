@@ -6,10 +6,9 @@ import os
 
 import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
-from MT5BotFramework.setting import STRATEGY_DIR, TYPE_FILLING
 from MT5BotFramework.exceptions.meta_trader_errors import (
-    InitializeError,
     TypeOrderError,
+    InitializeError,
 )
 import decimal
 
@@ -22,27 +21,12 @@ class Controller:
     """
 
     last_ticket = 0
+    conf = {}
 
-    def __init__(self, strategy_conf_file: str = None) -> None:
-        self.conf = self.conf_load_file(strategy_conf_file)
+    def __init__(self) -> None:
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise Warning("Error launching MetaTrader")
-
-    @staticmethod
-    def conf_load_file(strategy_conf_file: str = None) -> dict:
-        """
-        Load the bot strategy configuration.
-
-        :param strategy_conf_file: String with the name of the strategy configuration file.
-        :return: Dictionary with the content of the strategy configuration.
-        """
-        if not strategy_conf_file:
-            return {}
-        conf_path = os.path.join(STRATEGY_DIR, strategy_conf_file)
-        with open(conf_path, encoding="utf8") as json_file:
-            data = json.load(json_file)
-            return data
+            raise InitializeError("Error launching MetaTrader")
 
     def prepare_to_open_positions(self, type_order: str) -> dict:
         """
@@ -79,7 +63,9 @@ class Controller:
             "magic": self.conf.get("magic", 0),
             "comment": self.conf.get("comment", "V3N2R4"),
             "type_time": MetaTrader5.ORDER_TIME_GTC,
-            "type_filling": TYPE_FILLING,
+            "type_filling": self.conf.get(
+                "type_filling", MetaTrader5.ORDER_FILLING_RETURN
+            ),
         }
         return request
 

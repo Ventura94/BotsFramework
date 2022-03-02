@@ -4,6 +4,7 @@ Test strategy module
 
 import unittest
 from MT5BotFramework.core.strategy import Strategy
+import MetaTrader5
 
 
 class BotTest(Strategy):
@@ -11,7 +12,15 @@ class BotTest(Strategy):
     Bot test.
     """
 
-    conf_file: str = "test_strategy_conf.json"
+    conf = dict(
+        symbol="USDCAD",
+        account=5619236,
+        volume=0.01,
+        deviation=20,
+        magic=123456,
+        comment="V3N2R4",
+        type_filling=MetaTrader5.ORDER_FILLING_FOK,
+    )
 
     @staticmethod
     def get_data() -> dict:
