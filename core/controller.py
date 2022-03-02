@@ -161,11 +161,11 @@ class Controller:
             count += 1
         return result.comment
 
-    @staticmethod
-    def lot() -> float:
+    def lot(self) -> float:
         balance = MetaTrader5.account_info().balance
-        if balance > 40:
-            result = (balance / 40) / 100
+        balance_to_lot = self.conf.get("balance_to_lot", 40)
+        if balance > balance_to_lot:
+            result = (balance / balance_to_lot) / 100
         else:
             result = 0.01
         return float(
