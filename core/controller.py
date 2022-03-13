@@ -1,16 +1,12 @@
 """
  MetaTrader5 controller module.
 """
-import json
-import os
 
+import decimal
 import MetaTrader5
 from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
-from MT5BotFramework.exceptions.meta_trader_errors import (
-    TypeOrderError,
-    InitializeError,
-)
-import decimal
+
+from MT5BotFramework.settings import Settings
 
 
 class Controller:
@@ -21,96 +17,59 @@ class Controller:
     """
 
     last_ticket = 0
-    conf = {}
 
     def __init__(self) -> None:
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise InitializeError("Error launching MetaTrader")
+            raise Warning("Error launching MetaTrader")
+        self.settings = Settings()
 
-    def prepare_to_open_positions(self, type_order: str) -> dict:
+    def prepare_to_open_positions(self) -> dict:
         """
         Method that forms the dictionary with which to open position.
-
-        :param type_order: Type of order to be placed, accepts only "buy" or "sell".
-        :raise TypeOrderError: Fired when an unaccepted order type is submitted.
-        :return: Dictionary with the configuration of the command to be opened.
         """
-        if self.conf.get("custom_lot", False):
-            self.conf["volume"] = self.lot()
-
-        if type_order.lower() == "buy":
-            order = MetaTrader5.ORDER_TYPE_BUY
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf.get("symbol")
-            ).ask
-        elif type_order.lower() == "sell":
-            order = MetaTrader5.ORDER_TYPE_SELL
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                self.conf.get("symbol")
-            ).bid
-        else:
-            raise TypeOrderError(
-                'The type of order sent is not accepted, it must be "buy" or "sell"'
-            )
+        self.settings.open_order_redefine()
         request = {
-            "action": MetaTrader5.TRADE_ACTION_DEAL,
-            "symbol": self.conf.get("symbol"),
-            "volume": self.conf.get("volume", 0.01),
-            "type": order,
-            "price": price,
-            "deviation": self.conf.get("deviation", 20),
-            "magic": self.conf.get("magic", 0),
-            "comment": self.conf.get("comment", "V3N2R4"),
-            "type_time": MetaTrader5.ORDER_TIME_GTC,
-            "type_filling": self.conf.get(
-                "type_filling", MetaTrader5.ORDER_FILLING_RETURN
-            ),
+            "action": self.settings.action,
+            "symbol": self.settings.symbol,
+            "volume": self.settings.volume,
+            "type": self.settings.order_type,
+            "price": self.settings.price,
+            "deviation": self.settings.deviation,
+            "magic": self.settings.magic,
+            "comment": self.settings.comment,
+            "type_time": self.settings.type_time,
+            "type_filling": self.settings.type_filling,
         }
         return request
 
-    def open_market_positions(self, type_order: str, **kwargs) -> str:
+    def open_market_positions(self) -> str:
         """
         Open a position at market price.
-
-        :param type_order: Type of order to be placed, accepts only "buy" or "sell".
-        :param kwargs: Configuration this order.
-        :return: String with the result of sending the order to MetaTrader5.
         """
 
-        self.conf.update(kwargs)
-        request = self.prepare_to_open_positions(type_order)
+        request = self.prepare_to_open_positions()
         return self.send_to_metatrader(request)
 
-    @staticmethod
-    def prepare_to_close_positions(position: TradePosition) -> dict:
+    def prepare_to_close_positions(self, position: TradePosition) -> dict:
         """
         Method that forms the dictionary with which to close position.
 
         :param position: Position to close
         :return: Dictionary with the configuration of the command to be opened.
         """
-        symbol = position.symbol
-        type_order = position.type
+
         ticket = position.ticket
         volume = position.volume
-        if type_order == MetaTrader5.ORDER_TYPE_BUY:
-            order_type = MetaTrader5.ORDER_TYPE_SELL
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                symbol
-            ).bid
-        else:
-            order_type = MetaTrader5.ORDER_TYPE_BUY
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                symbol
-            ).ask
+        self.settings.symbol = position.symbol
+        self.settings.close_order_redefine(order_type=position.type)
         request = {
-            "action": MetaTrader5.TRADE_ACTION_DEAL,
-            "symbol": symbol,
+            "action": self.settings.action,
+            "symbol": self.settings.symbol,
             "position": ticket,
-            "price": price,
+            "price": self.settings.price,
             "volume": volume,
-            "type": order_type,
+            "type": self.settings.order_type,
         }
         return request
 
@@ -129,13 +88,12 @@ class Controller:
                 return self.send_to_metatrader(request)
         return "There are no positions to close"
 
-    def close_all_symbol_positions(self, **kwargs) -> str:
+    def close_all_symbol_positions(self) -> str:
         """
         Close all positions of a symbol.
         """
-        self.conf.update(kwargs)
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.conf.get("symbol")
+            symbol=self.settings.symbol
         )
         if positions:
             results = []
@@ -162,7 +120,8 @@ class Controller:
         return result.comment
 
     def lot(self) -> float:
-        balance = MetaTrader5.account_info().balance
+        """Calculate lot"""
+        balance = MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
         balance_to_lot = self.conf.get("balance_to_lot", 40)
         if balance > balance_to_lot:
             result = (balance / balance_to_lot) / 100

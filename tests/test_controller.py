@@ -3,8 +3,7 @@ Bot test module.
 """
 import unittest
 import MetaTrader5
-from MT5BotFramework.core.controller import Controller
-from MT5BotFramework.exceptions.meta_trader_errors import TypeOrderError
+from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
 
 
 class ControllerTest(unittest.TestCase):
@@ -45,7 +44,7 @@ class ControllerTest(unittest.TestCase):
         sell = self.controller.prepare_to_open_positions("sell")
         self.assertEqual(sell["type"], MetaTrader5.ORDER_TYPE_SELL)
         self.assertRaises(
-            TypeOrderError,
+            ValueError,
             self.controller.prepare_to_open_positions,
             "anything but a kind of position",
         )
@@ -61,7 +60,7 @@ class ControllerTest(unittest.TestCase):
             self.controller.open_market_positions("sell"), "Request executed"
         )
         self.assertRaises(
-            TypeOrderError,
+            ValueError,
             self.controller.open_market_positions,
             "anything but a kind of position",
         )
@@ -94,7 +93,7 @@ class ControllerTest(unittest.TestCase):
         )
 
     def tearDown(self):
-        positions: tuple = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+        positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             symbol=self.controller.conf.get("symbol")
         )
         if positions:

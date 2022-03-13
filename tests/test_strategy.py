@@ -3,8 +3,8 @@ Test strategy module
 """
 
 import unittest
-from MT5BotFramework.core.strategy import Strategy
 import MetaTrader5
+from MT5BotFramework.core.strategy import Strategy  # pylint: disable=import-error
 
 
 class BotTest(Strategy):

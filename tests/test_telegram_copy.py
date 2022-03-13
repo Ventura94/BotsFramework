@@ -1,6 +1,10 @@
+"""
+Telegram copy test
+"""
+
 import unittest
-from MT5BotFramework.core.telegram_copy import TelegramCopyProvider
 import MetaTrader5
+from MT5BotFramework.core.telegram_copy import TelegramCopyProvider
 
 
 class TelegramCopyProviderBot(TelegramCopyProvider):
