@@ -13,15 +13,6 @@ class TelegramCopyProvider(ABC):
 
     def __init__(self):
         self.controller = Controller()
-        self.controller.conf = self.conf
-
-    @property
-    @abstractmethod
-    def conf(self) -> dict:
-        """
-        Property to load configuration
-        """
-        ...
 
     @staticmethod
     @abstractmethod

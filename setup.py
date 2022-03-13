@@ -14,9 +14,9 @@ setuptools.setup(
     description="MetaTrader5 Bots Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Ventura94/NOWPayments-Python-API",
+    url="https://github.com/firagapecoin/MT5BotFramework",
     project_urls={
-        "Bug Tracker": "https://github.com/Ventura94/NOWPayments-Python-API/issues",
+        "Bug Tracker": "https://github.com/firagapecoin/MT5BotFramework/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",

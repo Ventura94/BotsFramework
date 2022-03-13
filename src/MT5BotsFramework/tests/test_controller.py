@@ -1,39 +1,24 @@
 # """
 # Bot test module.
 # """
-# import unittest
+# import pytest
 # import MetaTrader5
 # from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
+#
+#
+# @pytest.fixture
+# def controller():
+#     return Controller()
+#
+#
+# def test_prepare_to_open_positions():
+#     pass
 #
 #
 # class ControllerTest(unittest.TestCase):
 #     """
 #     Test Controller module.
 #     """
-#
-#     def setUp(self):
-#
-#         self.controller = Controller()
-#         self.controller.conf = dict(
-#             symbol="USDCAD",
-#             account=5619236,
-#             volume=0.01,
-#             deviation=20,
-#             magic=123456,
-#             comment="V3N2R4",
-#             type_filling=MetaTrader5.ORDER_FILLING_FOK,
-#         )
-#
-#     def test_load_config(self):
-#         """
-#         Check that the strategy configuration file is loaded correctly.
-#         """
-#         self.assertEqual(self.controller.conf.get("symbol"), "USDCAD")
-#         self.assertEqual(self.controller.conf.get("account"), 5619236)
-#         self.assertEqual(self.controller.conf.get("volume"), 0.01)
-#         self.assertEqual(self.controller.conf.get("deviation"), 20)
-#         self.assertEqual(self.controller.conf.get("magic"), 123456)
-#         self.assertEqual(self.controller.conf.get("comment"), "V3N2R4")
 #
 #     def test_prepare_to_open_positions(self):
 #         """

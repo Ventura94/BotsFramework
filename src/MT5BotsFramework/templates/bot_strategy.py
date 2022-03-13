@@ -6,22 +6,13 @@ from abc import ABC, abstractmethod
 from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
 
 
-class Strategy(ABC):
+class BotStrategy(ABC):
     """
     Abstract class for strategy bot.
     """
 
     def __init__(self):
         self.controller = Controller()
-        self.controller.conf = self.conf
-
-    @property
-    @abstractmethod
-    def conf(self) -> dict:
-        """
-        Property to load configuration
-        """
-        ...
 
     @staticmethod
     @abstractmethod

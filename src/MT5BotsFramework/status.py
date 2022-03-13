@@ -1,7 +1,7 @@
 import MetaTrader5
 
 
-class SettingsMeta(type):
+class StatusMeta(type):
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -11,7 +11,7 @@ class SettingsMeta(type):
         return cls._instances[cls]
 
 
-class Settings(metaclass=SettingsMeta):
+class Status(metaclass=StatusMeta):
     action = MetaTrader5.TRADE_ACTION_DEAL
     order_type = None
     symbol = None
@@ -64,14 +64,18 @@ class Settings(metaclass=SettingsMeta):
             try:
                 if self.order_type == MetaTrader5.ORDER_TYPE_BUY:
                     self.order_type = MetaTrader5.ORDER_TYPE_SELL
-                    self.price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                        self.symbol
-                    ).bid
+                    self.price = (
+                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                            self.symbol
+                        ).bid
+                    )
                 else:
                     self.order_type = MetaTrader5.ORDER_TYPE_BUY
-                    self.price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                        self.symbol
-                    ).ask
+                    self.price = (
+                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                            self.symbol
+                        ).ask
+                    )
             except TypeError:
                 count += 1
         raise TypeError("Meta Trader not return order or price")
