@@ -12,7 +12,6 @@ from MT5BotFramework.settings import Settings
 class Controller:
     """
     Controller MetaTrader5 bot class.
-
     :param strategy_conf_file: String with the name of the strategy configuration file.
     """
 
