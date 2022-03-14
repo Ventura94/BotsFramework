@@ -52,6 +52,7 @@ class Status(metaclass=StatusMeta):
                             self.symbol
                         ).bid
                     )
+                return
             except AttributeError:
                 count += 1
         raise TypeError("Meta Trader not return order or price")
@@ -76,6 +77,7 @@ class Status(metaclass=StatusMeta):
                             self.symbol
                         ).ask
                     )
+                return
             except TypeError:
                 count += 1
         raise TypeError("Meta Trader not return order or price")

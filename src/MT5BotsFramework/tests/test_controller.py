@@ -1,8 +1,9 @@
-# """
-# Bot test module.
-# """
+"""
+Bot test module.
+"""
 # import pytest
 # import MetaTrader5
+# from pytest_mock.plugin import MockerFixture
 # from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
 #
 #
@@ -12,25 +13,30 @@
 #
 #
 # def test_prepare_to_open_positions():
-#     pass
+#     mocker.patch.object(
+#         MetaTrader5,
+#         "get_url",
+#         return_value="https://api.nowpayments.io/v1/status",
+#         autospec=True,
+#     )
 #
-#
-# class ControllerTest(unittest.TestCase):
-#     """
-#     Test Controller module.
-#     """
-#
-#     def test_prepare_to_open_positions(self):
-#         """
-#         Test prepare to open positions.
-#         """
-#         buy = self.controller.prepare_to_open_positions("buy")
-#         self.assertEqual(buy["type"], MetaTrader5.ORDER_TYPE_BUY)
-#         sell = self.controller.prepare_to_open_positions("sell")
-#         self.assertEqual(sell["type"], MetaTrader5.ORDER_TYPE_SELL)
-#         self.assertRaises(
-#             ValueError,
-#             self.controller.prepare_to_open_positions,
+# #
+# # class ControllerTest(unittest.TestCase):
+# #     """
+# #     Test Controller module.
+# #     """
+# #
+# #     def test_prepare_to_open_positions(self):
+# #         """
+# #         Test prepare to open positions.
+# #         """
+# #         buy = self.controller.prepare_to_open_positions("buy")
+# #         self.assertEqual(buy["type"], MetaTrader5.ORDER_TYPE_BUY)
+# #         sell = self.controller.prepare_to_open_positions("sell")
+# #         self.assertEqual(sell["type"], MetaTrader5.ORDER_TYPE_SELL)
+# #         self.assertRaises(
+# #             ValueError,
+# #             self.controller.prepare_to_open_positions,
 #             "anything but a kind of position",
 #         )
 #
