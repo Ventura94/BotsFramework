@@ -26,13 +26,14 @@ class Controller:
         """
         Method that forms the dictionary with which to open position.
         """
-        self.status.update_to_open_order()
         request = {
             "action": self.status.action,
             "symbol": self.status.symbol,
             "volume": self.status.volume,
             "type": self.status.order_type,
             "price": self.status.price,
+            "tp": self.status.tp,
+            "sl": self.status.sl,
             "deviation": self.status.deviation,
             "magic": self.status.magic,
             "comment": self.status.comment,

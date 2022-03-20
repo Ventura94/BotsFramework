@@ -25,7 +25,6 @@ class Status(metaclass=StatusMeta):
     order_type = None
     symbol = None
     volume = 0.01
-    price = None
     sl = None
     tp = None
     deviation = 20
@@ -34,8 +33,26 @@ class Status(metaclass=StatusMeta):
     type_time = MetaTrader5.ORDER_TIME_GTC
     type_filling = MetaTrader5.ORDER_FILLING_RETURN
 
+    @property
+    def price(self):
+        if all([self.order_type is None, self.symbol is None]):
+            raise ValueError("Order Type or Symbol not define")
+        for i in range(3):
+            try:
+                if self.order_type == MetaTrader5.ORDER_TYPE_BUY:
+                    return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                        self.symbol
+                    ).ask
+                else:
+                    return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                        self.symbol
+                    ).bid
+            except AttributeError:
+                pass
+        raise TypeError("Meta Trader not return order or price")
+
     @classmethod
-    def order_type_redefine(cls, order_type: str):
+    def order_type_define(cls, order_type: str):
         order_type = order_type.lower()
         if order_type == "buy":
             cls.order_type = MetaTrader5.ORDER_TYPE_BUY
@@ -47,30 +64,6 @@ class Status(metaclass=StatusMeta):
             )
 
     @classmethod
-    def update_to_open_order(cls):
-        if all([cls.order_type is None, cls.symbol is None]):
-            raise ValueError("Order Type or Symbol not define")
-        count = 0
-        while count < 3:
-            try:
-                if cls.order_type == MetaTrader5.ORDER_TYPE_BUY:
-                    cls.price = (
-                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                            cls.symbol
-                        ).ask
-                    )
-                else:
-                    cls.price = (
-                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                            cls.symbol
-                        ).bid
-                    )
-                return
-            except AttributeError:
-                count += 1
-        raise TypeError("Meta Trader not return order or price")
-
-    @classmethod
     def update_to_close_order(cls):
         if all([cls.order_type is None, cls.symbol is None]):
             raise ValueError("Order Type or Symbol not define")
@@ -79,18 +72,8 @@ class Status(metaclass=StatusMeta):
             try:
                 if cls.order_type == MetaTrader5.ORDER_TYPE_BUY:
                     cls.order_type = MetaTrader5.ORDER_TYPE_SELL
-                    cls.price = (
-                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                            cls.symbol
-                        ).bid
-                    )
                 else:
                     cls.order_type = MetaTrader5.ORDER_TYPE_BUY
-                    cls.price = (
-                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                            cls.symbol
-                        ).ask
-                    )
                 return
             except TypeError:
                 count += 1
