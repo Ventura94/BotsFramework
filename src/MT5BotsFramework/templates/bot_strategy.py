@@ -3,7 +3,8 @@ Strategy Module. Contain the abstract class Strategy, to implement strategy bots
 """
 
 from abc import ABC, abstractmethod
-from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
+from MT5BotsFramework.core.controller import Controller  # pylint: disable=import-error
+from MT5BotsFramework.status import Status
 
 
 class BotStrategy(ABC):
@@ -31,6 +32,7 @@ class BotStrategy(ABC):
 
         :return: None
         """
+        self.controller.open_market_positions()
 
     def start(self) -> None:
         """
@@ -39,5 +41,11 @@ class BotStrategy(ABC):
 
         :return: None
         """
+
         while True:
+            if buy:
+                Status.order_type_redefine("buy")
+            else:
+                Status.order_type_redefine("sell")
             self.strategy_bot()
+

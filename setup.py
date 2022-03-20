@@ -1,6 +1,7 @@
 """
 Setup
 """
+
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -21,9 +22,10 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: Windows",
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
+    install_requires=["MetaTrader5;platform_system=='Windows'"],
 )
