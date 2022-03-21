@@ -11,7 +11,6 @@ from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
 class Controller:
     """
     Controller MetaTrader5 bot class.
-    :param strategy_conf_file: String with the name of the strategy configuration file.
     """
 
     last_ticket = 0
@@ -40,6 +39,10 @@ class Controller:
             "type_time": self.status.type_time,
             "type_filling": self.status.type_filling,
         }
+        if self.status.tp is None:
+            del request['tp']
+        if self.status.sl is None:
+            del request['sl']
         return request
 
     def open_market_positions(self) -> str:
@@ -59,17 +62,26 @@ class Controller:
 
         ticket = position.ticket
         volume = position.volume
-        self.settings.symbol = position.symbol
-        self.settings.close_order_redefine(order_type=position.type)
+        self.status.symbol = position.symbol
+        self.status.update_to_close_order()
         request = {
-            "action": self.settings.action,
-            "symbol": self.settings.symbol,
+            "action": self.status.action,
+            "symbol": self.status.symbol,
             "position": ticket,
-            "price": self.settings.price,
+            "price": self.status.price,
             "volume": volume,
-            "type": self.settings.order_type,
+            "type": self.status.order_type,
         }
         return request
+
+    @staticmethod
+    def get_position_by_ticket(ticket: int) -> TradePosition:
+        position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
+            ticket=ticket
+        )
+        if position:
+            return position[0]
+        return None
 
     def close_positions_by_ticket(self, ticket: int) -> str:
         """
@@ -77,13 +89,10 @@ class Controller:
 
         :return: Closing result.
         """
-        positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            ticket=ticket
-        )
-        if positions:
-            for position in positions:
-                request = self.prepare_to_close_positions(position)
-                return self.__send_to_metatrader(request)
+        position = self.get_position_by_ticket(ticket)
+        if position:
+            request = self.__prepare_to_close_positions(position)
+            return self.__send_to_metatrader(request)
         return "There are no positions to close"
 
     def close_all_symbol_positions(self) -> str:
@@ -91,15 +100,15 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.settings.symbol
+            symbol=self.status.symbol
         )
         if positions:
             results = []
             for position in positions:
-                request = self.prepare_to_close_positions(position)
+                request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return f"Report close order: {results}"
-        return f"There are no {self.conf.get('symbol')} positions to close"
+        return f"There are no {self.status.symbol} positions to close"
 
     def __send_to_metatrader(self, request: dict) -> str:
         """
