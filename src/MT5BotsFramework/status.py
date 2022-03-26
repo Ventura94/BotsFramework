@@ -8,6 +8,7 @@ class StatusMeta(type):
     """
     Status metaclass, necessary for the Singleton Pattern Design.
     """
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -21,6 +22,7 @@ class Status(metaclass=StatusMeta):
     """
     Status class.
     """
+
     action = MetaTrader5.TRADE_ACTION_DEAL
     order_type = None
     symbol = None
@@ -34,25 +36,35 @@ class Status(metaclass=StatusMeta):
     type_filling = MetaTrader5.ORDER_FILLING_RETURN
 
     @property
-    def price(self):
+    def price(self) -> None:
+        """
+        Last price.
+        :return: None
+        """
         if all([self.order_type is None, self.symbol is None]):
             raise ValueError("Order Type or Symbol not define")
-        for i in range(3):
+        for _ in range(3):
             try:
                 if self.order_type == MetaTrader5.ORDER_TYPE_BUY:
-                    return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                        self.symbol
-                    ).ask
-                else:
-                    return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                        self.symbol
-                    ).bid
+                    return (
+                        MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                            self.symbol
+                        ).ask
+                    )
+                return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                    self.symbol
+                ).bid
             except AttributeError:
                 pass
         raise TypeError("Meta Trader not return order or price")
 
     @classmethod
-    def order_type_define(cls, order_type: str):
+    def order_type_define(cls, order_type: str) -> None:
+        """
+        Define type order.
+        :param order_type: Buy or Sell
+        :return: None
+        """
         order_type = order_type.lower()
         if order_type == "buy":
             cls.order_type = MetaTrader5.ORDER_TYPE_BUY
@@ -64,7 +76,11 @@ class Status(metaclass=StatusMeta):
             )
 
     @classmethod
-    def update_to_close_order(cls):
+    def update_to_close_order(cls) -> None:
+        """
+        Update the status to close the order.
+        :return: None.
+        """
         if all([cls.order_type is None, cls.symbol is None]):
             raise ValueError("Order Type or Symbol not define")
         count = 0

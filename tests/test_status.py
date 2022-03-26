@@ -58,8 +58,8 @@ def test_order_type_redefine_error() -> None:
     """
     Status.symbol = None
     with pytest.raises(
-            ValueError,
-            match='The type of order sent is not accepted, it must be "buy" or "sell"',
+        ValueError,
+        match='The type of order sent is not accepted, it must be "buy" or "sell"',
     ):
         Status.order_type_redefine(order_type="other")
 
@@ -105,8 +105,8 @@ def test_update_to_close_order_symbol_none() -> None:
 
 
 def test_update_to_open_order_buy(
-        mocker: MockerFixture,
-        mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
+    mocker: MockerFixture,
+    mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
 ) -> None:
     """
     Update to open order buy test with MetaTrade5 object mocker.
@@ -123,8 +123,8 @@ def test_update_to_open_order_buy(
 
 
 def test_update_to_open_order_sell(
-        mocker: MockerFixture,
-        mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
+    mocker: MockerFixture,
+    mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
 ) -> None:
     """
     Update to open order sell test with MetaTrade5 object mocker.
@@ -141,8 +141,8 @@ def test_update_to_open_order_sell(
 
 
 def test_update_to_close_order_buy(
-        mocker: MockerFixture,
-        mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
+    mocker: MockerFixture,
+    mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
 ) -> None:
     """
     Update to close order buy test with MetaTrade5 object mocker.
@@ -159,8 +159,8 @@ def test_update_to_close_order_buy(
 
 
 def test_update_to_close_order_sell(
-        mocker: MockerFixture,
-        mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
+    mocker: MockerFixture,
+    mocker_symbol_info_tick_method: MockerFixture,  # pylint: disable=redefined-outer-name
 ) -> None:
     """
     Update to close order sell test with MetaTrade5 object mocker.

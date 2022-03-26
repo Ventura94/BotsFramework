@@ -3,12 +3,17 @@
 """
 
 import decimal
+from typing import List, Dict, Union
 import MetaTrader5
-from typing import List
+from MetaTrader5 import (
+    TradePosition,
+    OrderSendResult,
+)  # pylint: disable=no-name-in-module
 from MT5BotsFramework.status import Status
-from MetaTrader5 import TradePosition, OrderSendResult  # pylint: disable=no-name-in-module
-from MT5BotsFramework.exceptions.mt5_errors import (InitializeException,
-                                                    PositionException)
+from MT5BotsFramework.exceptions.mt5_errors import (
+    InitializeException,
+    PositionException,
+)
 
 
 class Controller:
@@ -22,7 +27,9 @@ class Controller:
             raise InitializeException("Error launching MetaTrader")
         self.status = Status()
 
-    def __prepare_to_open_positions(self) -> dict:
+    def __prepare_to_open_positions(
+        self,
+    ) -> Dict[str, Union[str, int, decimal.Decimal]]:
         """
         Method that forms the dictionary with which to open position.
         """
@@ -41,9 +48,9 @@ class Controller:
             "type_filling": self.status.type_filling,
         }
         if self.status.tp is None:
-            del request['tp']
+            del request["tp"]
         if self.status.sl is None:
-            del request['sl']
+            del request["sl"]
         return request
 
     def open_market_positions(self) -> OrderSendResult:
@@ -60,7 +67,9 @@ class Controller:
 
         :return: Balance of the account.
         """
-        return MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
+        return (
+            MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
+        )
 
     def __prepare_to_close_positions(self, position: TradePosition) -> dict:
         """
@@ -86,11 +95,14 @@ class Controller:
 
     @staticmethod
     def get_position_by_ticket(ticket: int) -> TradePosition:
+        """
+        Get position by ticket.
+        :param ticket: Ticket of the position.
+        :return: TradePosition object.
+        """
         position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             ticket=ticket
         )
-        print(ticket)
-        print(position)
         if position:
             return position[0]
         raise PositionException("Position not found")
@@ -118,7 +130,7 @@ class Controller:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return results
-        raise
+        raise PositionException(f" Not found positions for symbol {self.status.symbol}")
 
     def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
         """
@@ -131,15 +143,17 @@ class Controller:
         return position.profit
 
     @staticmethod
-    def __send_to_metatrader(request: dict) -> OrderSendResult:
+    def __send_to_metatrader(
+        request: Dict[str, Union[str, int, decimal.Decimal]]
+    ) -> OrderSendResult:
         """
         Send order to metatrader.
 
         :param dict request: Request data to metatrader.
         """
         last_result = None
-        for i in range(3):
-            result = MetaTrader5.order_send(request)
+        for _ in range(3):
+            result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
                 return result
             last_result = result

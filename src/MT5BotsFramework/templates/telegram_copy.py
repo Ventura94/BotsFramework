@@ -3,7 +3,7 @@ This module performs copy trading with telegram messages.
 """
 
 from abc import ABC, abstractmethod
-from MT5BotFramework.core.controller import Controller  # pylint: disable=import-error
+from MT5BotsFramework.core.controller import Controller  # pylint: disable=import-error
 
 
 class TelegramCopyProvider(ABC):
