@@ -28,7 +28,7 @@ class Controller:
         self.status = Status()
 
     def __prepare_to_open_positions(
-        self,
+            self,
     ) -> Dict[str, Union[str, int, decimal.Decimal]]:
         """
         Method that forms the dictionary with which to open position.
@@ -144,7 +144,7 @@ class Controller:
 
     @staticmethod
     def __send_to_metatrader(
-        request: Dict[str, Union[str, int, decimal.Decimal]]
+            request: Dict[str, Union[str, int, decimal.Decimal]]
     ) -> OrderSendResult:
         """
         Send order to metatrader.
