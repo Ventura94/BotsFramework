@@ -5,10 +5,10 @@
 import decimal
 from typing import List, Dict, Union
 import MetaTrader5
-from MetaTrader5 import (
+from MetaTrader5 import (  # pylint: disable=no-name-in-module
     TradePosition,
     OrderSendResult,
-)  # pylint: disable=no-name-in-module
+)
 from MT5BotsFramework.status import Status
 from MT5BotsFramework.exceptions.mt5_errors import (
     InitializeException,
