@@ -32,7 +32,6 @@ class BotStrategy(ABC):
 
         :return: None
         """
-        self.controller.open_market_positions()
 
     def start(self) -> None:
         """
@@ -41,11 +40,5 @@ class BotStrategy(ABC):
 
         :return: None
         """
-
         while True:
-            if buy:
-                Status.order_type_redefine("buy")
-            else:
-                Status.order_type_redefine("sell")
             self.strategy_bot()
-

@@ -34,10 +34,6 @@ class Status(metaclass=StatusMeta):
     type_filling = MetaTrader5.ORDER_FILLING_RETURN
 
     @property
-    def balance(self):
-        return MetaTrader5.account_info().balance
-
-    @property
     def price(self):
         if all([self.order_type is None, self.symbol is None]):
             raise ValueError("Order Type or Symbol not define")

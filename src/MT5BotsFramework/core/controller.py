@@ -4,8 +4,11 @@
 
 import decimal
 import MetaTrader5
+from typing import List
 from MT5BotsFramework.status import Status
-from MetaTrader5 import TradePosition  # pylint: disable=no-name-in-module
+from MetaTrader5 import TradePosition, OrderSendResult  # pylint: disable=no-name-in-module
+from MT5BotsFramework.exceptions.mt5_errors import (InitializeException,
+                                                    PositionException)
 
 
 class Controller:
@@ -13,12 +16,10 @@ class Controller:
     Controller MetaTrader5 bot class.
     """
 
-    last_ticket = 0
-
     def __init__(self) -> None:
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise Warning("Error launching MetaTrader")
+            raise InitializeException("Error launching MetaTrader")
         self.status = Status()
 
     def __prepare_to_open_positions(self) -> dict:
@@ -45,12 +46,21 @@ class Controller:
             del request['sl']
         return request
 
-    def open_market_positions(self) -> str:
+    def open_market_positions(self) -> OrderSendResult:
         """
         Open a position at market price.
         """
         request = self.__prepare_to_open_positions()
         return self.__send_to_metatrader(request)
+
+    @staticmethod
+    def get_balance() -> decimal.Decimal:
+        """
+        Get balance of the account.
+
+        :return: Balance of the account.
+        """
+        return MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
 
     def __prepare_to_close_positions(self, position: TradePosition) -> dict:
         """
@@ -79,9 +89,11 @@ class Controller:
         position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
             ticket=ticket
         )
+        print(ticket)
+        print(position)
         if position:
             return position[0]
-        return None
+        raise PositionException("Position not found")
 
     def close_positions_by_ticket(self, ticket: int) -> str:
         """
@@ -90,12 +102,10 @@ class Controller:
         :return: Closing result.
         """
         position = self.get_position_by_ticket(ticket)
-        if position:
-            request = self.__prepare_to_close_positions(position)
-            return self.__send_to_metatrader(request)
-        return "There are no positions to close"
+        request = self.__prepare_to_close_positions(position)
+        return self.__send_to_metatrader(request)
 
-    def close_all_symbol_positions(self) -> str:
+    def close_all_symbol_positions(self) -> List[OrderSendResult]:
         """
         Close all positions of a symbol.
         """
@@ -107,24 +117,33 @@ class Controller:
             for position in positions:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
-            return f"Report close order: {results}"
-        return f"There are no {self.status.symbol} positions to close"
+            return results
+        raise
 
-    def __send_to_metatrader(self, request: dict) -> str:
+    def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
+        """
+        Get profit by ticket.
+
+        :param ticket: Ticket of the position.
+        :return: Profit of the position.
+        """
+        position = self.get_position_by_ticket(ticket)
+        return position.profit
+
+    @staticmethod
+    def __send_to_metatrader(request: dict) -> OrderSendResult:
         """
         Send order to metatrader.
 
         :param dict request: Request data to metatrader.
         """
-        count = 0
-        result = None
-        while count < 3:
-            result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
+        last_result = None
+        for i in range(3):
+            result = MetaTrader5.order_send(request)
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
-                self.last_ticket = result.order
-                return result.comment
-            count += 1
-        return result.comment
+                return result
+            last_result = result
+        return last_result
 
     # def lot(self) -> float:
     #     """Calculate lot"""
