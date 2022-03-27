@@ -11,7 +11,6 @@ from MetaTrader5 import (  # pylint: disable=no-name-in-module
 )
 from MT5BotsFramework.status import Status
 from MT5BotsFramework.exceptions.mt5_errors import PositionException, InitializeException
-from MT5BotsFramework.decorators.initialize_account import InitializeAccount
 
 
 class Controller:
@@ -63,7 +62,6 @@ class Controller:
         return self.__send_to_metatrader(request)
 
     @staticmethod
-    @InitializeAccount
     def get_balance() -> decimal.Decimal:
         """
         Get balance of the account.
@@ -97,7 +95,6 @@ class Controller:
         return request
 
     @staticmethod
-    @InitializeAccount
     def get_position_by_ticket(ticket: int) -> TradePosition:
         """
         Get position by ticket.
@@ -136,7 +133,6 @@ class Controller:
             return results
         raise PositionException(f" Not found positions for symbol {self.request_config.symbol}")
 
-    @InitializeAccount
     def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
         """
         Get profit by ticket.
@@ -148,7 +144,6 @@ class Controller:
         return position.profit
 
     @staticmethod
-    @InitializeAccount
     def __send_to_metatrader(
             request: Dict[str, Union[str, int, decimal.Decimal]]
     ) -> OrderSendResult:

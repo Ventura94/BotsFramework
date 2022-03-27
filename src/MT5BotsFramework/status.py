@@ -3,6 +3,7 @@ Status module.
 """
 from threading import Lock
 from typing import Dict
+
 import MetaTrader5
 
 
@@ -15,7 +16,6 @@ class StatusMeta(type):
     _lock: Lock = Lock()
 
     def __call__(cls, *args, **kwargs):
-
         if cls not in cls._instances:
             with cls._lock:
                 instance = super().__call__(*args, **kwargs)
@@ -40,6 +40,7 @@ class RequestConfig:
         Last price.
         :return: None
         """
+
         if all([self.order_type is None, self.symbol is None]):
             raise ValueError("Order Type or Symbol not define")
         for _ in range(3):
