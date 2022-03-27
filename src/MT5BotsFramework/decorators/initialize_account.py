@@ -13,9 +13,9 @@ class InitializeAccount(object):
 
     def __call__(self, *args, **kwargs):
         if not MetaTrader5.initialize(  # pylint: disable=maybe-no-member
-                login=Status.account,
-                password=Status.password,
-                server=Status.server,
+                login=Status().account,
+                password=Status().password,
+                server=Status().server,
         ):
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeException("Error launching MetaTrader")

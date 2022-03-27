@@ -28,6 +28,11 @@ class Status(metaclass=StatusMeta):
     account = None
     password = None
     server = None
+    type_time = MetaTrader5.ORDER_TIME_GTC
+    type_filling = MetaTrader5.ORDER_FILLING_RETURN
+
+
+class RequestConfig:
     action = MetaTrader5.TRADE_ACTION_DEAL
     order_type = None
     symbol = None
@@ -37,8 +42,6 @@ class Status(metaclass=StatusMeta):
     deviation = 20
     magic = 0
     comment = "V3N2R4"
-    type_time = MetaTrader5.ORDER_TIME_GTC
-    type_filling = MetaTrader5.ORDER_FILLING_RETURN
 
     @property
     def price(self) -> None:

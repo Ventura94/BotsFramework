@@ -10,22 +10,14 @@ from MetaTrader5 import (  # pylint: disable=no-name-in-module
     OrderSendResult,
 )
 from MT5BotsFramework.status import Status
-from MT5BotsFramework.exceptions.mt5_errors import (
-    InitializeException,
-    PositionException,
-)
+from MT5BotsFramework.exceptions.mt5_errors import PositionException
+from MT5BotsFramework.decorators.initialize_account import InitializeAccount
 
 
 class Controller:
     """
     Controller MetaTrader5 bot class.
     """
-
-    def __init__(self) -> None:
-        if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
-            MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise InitializeException("Error launching MetaTrader")
-        self.status = Status()
 
     def __prepare_to_open_positions(
             self,
@@ -34,22 +26,22 @@ class Controller:
         Method that forms the dictionary with which to open position.
         """
         request = {
-            "action": self.status.action,
-            "symbol": self.status.symbol,
-            "volume": self.status.volume,
-            "type": self.status.order_type,
-            "price": self.status.price,
-            "tp": self.status.tp,
-            "sl": self.status.sl,
-            "deviation": self.status.deviation,
-            "magic": self.status.magic,
-            "comment": self.status.comment,
-            "type_time": self.status.type_time,
-            "type_filling": self.status.type_filling,
+            "action": Status().action,
+            "symbol": Status().symbol,
+            "volume": Status().volume,
+            "type": Status().order_type,
+            "price": Status().price,
+            "tp": Status().tp,
+            "sl": Status().sl,
+            "deviation": Status().deviation,
+            "magic": Status().magic,
+            "comment": Status().comment,
+            "type_time": Status().type_time,
+            "type_filling": Status().type_filling,
         }
-        if self.status.tp is None:
+        if Status().tp is None:
             del request["tp"]
-        if self.status.sl is None:
+        if Status().sl is None:
             del request["sl"]
         return request
 
@@ -61,6 +53,7 @@ class Controller:
         return self.__send_to_metatrader(request)
 
     @staticmethod
+    @InitializeAccount
     def get_balance() -> decimal.Decimal:
         """
         Get balance of the account.
@@ -81,19 +74,20 @@ class Controller:
 
         ticket = position.ticket
         volume = position.volume
-        self.status.symbol = position.symbol
-        self.status.update_to_close_order()
+        Status().symbol = position.symbol
+        Status().update_to_close_order()
         request = {
-            "action": self.status.action,
-            "symbol": self.status.symbol,
+            "action": Status().action,
+            "symbol": Status().symbol,
             "position": ticket,
-            "price": self.status.price,
+            "price": Status().price,
             "volume": volume,
-            "type": self.status.order_type,
+            "type": Status().order_type,
         }
         return request
 
     @staticmethod
+    @InitializeAccount
     def get_position_by_ticket(ticket: int) -> TradePosition:
         """
         Get position by ticket.
@@ -122,7 +116,7 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.status.symbol
+            symbol=Status().symbol
         )
         if positions:
             results = []
@@ -130,8 +124,9 @@ class Controller:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return results
-        raise PositionException(f" Not found positions for symbol {self.status.symbol}")
+        raise PositionException(f" Not found positions for symbol {Status().symbol}")
 
+    @InitializeAccount
     def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
         """
         Get profit by ticket.
@@ -143,6 +138,7 @@ class Controller:
         return position.profit
 
     @staticmethod
+    @InitializeAccount
     def __send_to_metatrader(
             request: Dict[str, Union[str, int, decimal.Decimal]]
     ) -> OrderSendResult:
