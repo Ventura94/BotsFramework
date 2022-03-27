@@ -25,7 +25,9 @@ class Status(metaclass=StatusMeta):
     """
     Status class.
     """
-
+    account = None
+    password = None
+    server = None
     action = MetaTrader5.TRADE_ACTION_DEAL
     order_type = None
     symbol = None
