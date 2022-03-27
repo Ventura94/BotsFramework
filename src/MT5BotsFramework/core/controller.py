@@ -3,7 +3,7 @@
 """
 
 import decimal
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Literal
 import MetaTrader5
 from MetaTrader5 import (  # pylint: disable=no-name-in-module
     TradePosition,
@@ -18,7 +18,17 @@ class Controller:
     Controller MetaTrader5 bot class.
     """
 
-    def __init__(self, bot_id: int) -> None:
+    action = MetaTrader5.TRADE_ACTION_DEAL
+    order_type = None
+    symbol = None
+    volume = 0.01
+    sl = None
+    tp = None
+    deviation = 20
+    magic = 0
+    comment = "V3N2R4"
+
+    def __init__(self) -> None:
         if not MetaTrader5.initialize(  # pylint: disable=maybe-no-member
                 login=Status().account,
                 password=Status().password,
@@ -26,7 +36,32 @@ class Controller:
         ):
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeException(MetaTrader5.last_error())
-        self.request_config = Status().register_request_config(bot_id)
+
+    def order_type_define(self, order_type: Literal["buy", "sell"]) -> None:
+        """
+        Define type order.
+        :param order_type: Buy or Sell
+        :return: None
+        """
+        order_type = order_type.lower()
+        if order_type == "buy":
+            self.order_type = MetaTrader5.ORDER_TYPE_BUY
+        elif order_type == "sell":
+            self.order_type = MetaTrader5.ORDER_TYPE_SELL
+        else:
+            raise ValueError(
+                'The type of order sent is not accepted, it must be "buy" or "sell"'
+            )
+
+    def get_buy_price(self):
+        return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+            self.symbol
+        ).ask
+
+    def get_sell_price(self):
+        return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+            self.symbol
+        ).bid
 
     def __prepare_to_open_positions(
             self,
@@ -34,17 +69,21 @@ class Controller:
         """
         Method that forms the dictionary with which to open position.
         """
+        if self.order_type == MetaTrader5.ORDER_TYPE_BUY:
+            price = self.get_buy_price()
+        else:
+            price = self.get_sell_price()
         request = {
-            "action": self.request_config.action,
-            "symbol": self.request_config.symbol,
-            "volume": self.request_config.volume,
-            "type": self.request_config.order_type,
-            "price": self.request_config.price,
-            "tp": self.request_config.tp,
-            "sl": self.request_config.sl,
-            "deviation": self.request_config.deviation,
-            "magic": self.request_config.magic,
-            "comment": self.request_config.comment,
+            "action": self.action,
+            "symbol": self.symbol,
+            "volume": self.volume,
+            "type": self.order_type,
+            "price": price,
+            "tp": self.tp,
+            "sl": self.sl,
+            "deviation": self.deviation,
+            "magic": self.magic,
+            "comment": self.comment,
             "type_time": Status().type_time,
             "type_filling": Status().type_filling,
         }
@@ -94,7 +133,7 @@ class Controller:
                 symbol
             ).ask
         request = {
-            "action": self.request_config.action,
+            "action": self.action,
             "symbol": symbol,
             "position": ticket,
             "price": price,
@@ -132,7 +171,7 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.request_config.symbol
+            symbol=self.symbol
         )
         if positions:
             results = []
@@ -140,7 +179,7 @@ class Controller:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return results
-        raise PositionException(f" Not found positions for symbol {self.request_config.symbol}")
+        raise PositionException(f" Not found positions for symbol {self.symbol}")
 
     def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
         """
