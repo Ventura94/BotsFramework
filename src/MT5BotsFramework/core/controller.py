@@ -10,7 +10,7 @@ from MetaTrader5 import (  # pylint: disable=no-name-in-module
     OrderSendResult,
 )
 from MT5BotsFramework.status import Status
-from MT5BotsFramework.exceptions.mt5_errors import PositionException
+from MT5BotsFramework.exceptions.mt5_errors import PositionException, InitializeException
 from MT5BotsFramework.decorators.initialize_account import InitializeAccount
 
 
@@ -19,6 +19,16 @@ class Controller:
     Controller MetaTrader5 bot class.
     """
 
+    def __init__(self, bot_id: int) -> None:
+        if not MetaTrader5.initialize(  # pylint: disable=maybe-no-member
+                login=Status().account,
+                password=Status().password,
+                server=Status().server,
+        ):
+            MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
+            raise InitializeException(MetaTrader5.last_error())
+        self.request_config = Status().register_request_config(bot_id)
+
     def __prepare_to_open_positions(
             self,
     ) -> Dict[str, Union[str, int, decimal.Decimal]]:
@@ -26,22 +36,22 @@ class Controller:
         Method that forms the dictionary with which to open position.
         """
         request = {
-            "action": Status().action,
-            "symbol": Status().symbol,
-            "volume": Status().volume,
-            "type": Status().order_type,
-            "price": Status().price,
-            "tp": Status().tp,
-            "sl": Status().sl,
-            "deviation": Status().deviation,
-            "magic": Status().magic,
-            "comment": Status().comment,
+            "action": self.request_config.action,
+            "symbol": self.request_config.symbol,
+            "volume": self.request_config.volume,
+            "type": self.request_config.order_type,
+            "price": self.request_config.price,
+            "tp": self.request_config.tp,
+            "sl": self.request_config.sl,
+            "deviation": self.request_config.deviation,
+            "magic": self.request_config.magic,
+            "comment": self.request_config.comment,
             "type_time": Status().type_time,
             "type_filling": Status().type_filling,
         }
-        if Status().tp is None:
+        if request.get("tp") is None:
             del request["tp"]
-        if Status().sl is None:
+        if request.get("sl") is None:
             del request["sl"]
         return request
 
@@ -74,15 +84,15 @@ class Controller:
 
         ticket = position.ticket
         volume = position.volume
-        Status().symbol = position.symbol
-        Status().update_to_close_order()
+        self.request_config.symbol = position.symbol
+        self.request_config.update_to_close_order()
         request = {
-            "action": Status().action,
-            "symbol": Status().symbol,
+            "action": self.request_config.action,
+            "symbol": self.request_config.symbol,
             "position": ticket,
-            "price": Status().price,
+            "price": self.request_config.price,
             "volume": volume,
-            "type": Status().order_type,
+            "type": self.request_config.order_type,
         }
         return request
 
@@ -116,7 +126,7 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=Status().symbol
+            symbol=self.request_config.symbol
         )
         if positions:
             results = []
@@ -124,7 +134,7 @@ class Controller:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return results
-        raise PositionException(f" Not found positions for symbol {Status().symbol}")
+        raise PositionException(f" Not found positions for symbol {self.request_config.symbol}")
 
     @InitializeAccount
     def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:

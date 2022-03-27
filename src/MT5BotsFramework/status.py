@@ -2,6 +2,7 @@
 Status module.
 """
 from threading import Lock
+from typing import Dict
 import MetaTrader5
 
 
@@ -14,22 +15,12 @@ class StatusMeta(type):
     _lock: Lock = Lock()
 
     def __call__(cls, *args, **kwargs):
-        with cls._lock:
-            if cls not in cls._instances:
+
+        if cls not in cls._instances:
+            with cls._lock:
                 instance = super().__call__(*args, **kwargs)
                 cls._instances[cls] = instance
         return cls._instances[cls]
-
-
-class Status(metaclass=StatusMeta):
-    """
-    Status class.
-    """
-    account = None
-    password = None
-    server = None
-    type_time = MetaTrader5.ORDER_TIME_GTC
-    type_filling = MetaTrader5.ORDER_FILLING_RETURN
 
 
 class RequestConfig:
@@ -102,3 +93,26 @@ class RequestConfig:
             except TypeError:
                 count += 1
         raise TypeError("Meta Trader not return order or price")
+
+
+class Status(metaclass=StatusMeta):
+    """
+    Status class.
+    """
+    account: int = None
+    password: str = None
+    server: str = None
+    type_time: int = MetaTrader5.ORDER_TIME_GTC
+    type_filling: int = MetaTrader5.ORDER_FILLING_RETURN
+    request_config: Dict[int, RequestConfig] = {}
+
+    @classmethod
+    def register_request_config(cls, bot_id: int) -> RequestConfig:
+        """
+        Register the request configuration.
+        :param bot_id: Bot ID.
+        :return: None.
+        """
+        if cls.request_config.get(bot_id) is None:
+            cls.request_config[bot_id] = RequestConfig()
+        return cls.request_config.get(bot_id)
