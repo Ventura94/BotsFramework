@@ -82,15 +82,24 @@ class Controller:
 
         ticket = position.ticket
         volume = position.volume
-        self.request_config.symbol = position.symbol
-        self.request_config.update_to_close_order()
+        symbol = position.symbol
+        if position.type == MetaTrader5.ORDER_TYPE_BUY:
+            order_type = MetaTrader5.ORDER_TYPE_SELL
+            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                symbol
+            ).bid
+        else:
+            order_type = MetaTrader5.ORDER_TYPE_BUY
+            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
+                symbol
+            ).ask
         request = {
             "action": self.request_config.action,
-            "symbol": self.request_config.symbol,
+            "symbol": symbol,
             "position": ticket,
-            "price": self.request_config.price,
+            "price": price,
             "volume": volume,
-            "type": self.request_config.order_type,
+            "type": order_type,
         }
         return request
 

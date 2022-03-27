@@ -40,7 +40,6 @@ class RequestConfig:
         Last price.
         :return: None
         """
-
         if all([self.order_type is None, self.symbol is None]):
             raise ValueError("Order Type or Symbol not define")
         for _ in range(3):
@@ -75,26 +74,6 @@ class RequestConfig:
                 'The type of order sent is not accepted, it must be "buy" or "sell"'
             )
 
-    @classmethod
-    def update_to_close_order(cls) -> None:
-        """
-        Update the status to close the order.
-        :return: None.
-        """
-        if all([cls.order_type is None, cls.symbol is None]):
-            raise ValueError("Order Type or Symbol not define")
-        count = 0
-        while count < 3:
-            try:
-                if cls.order_type == MetaTrader5.ORDER_TYPE_BUY:
-                    cls.order_type = MetaTrader5.ORDER_TYPE_SELL
-                else:
-                    cls.order_type = MetaTrader5.ORDER_TYPE_BUY
-                return
-            except TypeError:
-                count += 1
-        raise TypeError("Meta Trader not return order or price")
-
 
 class Status(metaclass=StatusMeta):
     """
@@ -114,6 +93,6 @@ class Status(metaclass=StatusMeta):
         :param bot_id: Bot ID.
         :return: None.
         """
-        if cls.request_config.get(bot_id) is None:
+        if cls.request_config.get(bot_id, None) is None:
             cls.request_config[bot_id] = RequestConfig()
         return cls.request_config.get(bot_id)
