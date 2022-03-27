@@ -158,7 +158,7 @@ class Controller:
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
                 return result
             last_result = result
-        return last_result
+        raise ValueError(f"Error {last_result.comment}")
 
     # def lot(self) -> float:
     #     """Calculate lot"""
