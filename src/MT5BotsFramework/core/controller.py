@@ -10,7 +10,12 @@ from MetaTrader5 import (  # pylint: disable=no-name-in-module
     OrderSendResult,
 )
 from MT5BotsFramework.status import Status
-from MT5BotsFramework.exceptions.mt5_errors import PositionException, InitializeException
+from MT5BotsFramework.exceptions.mt5_errors import (
+    PositionException,
+    InitializeException,
+    BalanceException,
+    UnknownException
+)
 
 
 class Controller:
@@ -53,12 +58,20 @@ class Controller:
                 'The type of order sent is not accepted, it must be "buy" or "sell"'
             )
 
-    def get_buy_price(self):
+    def get_buy_price(self) -> float:
+        """
+        Get buy price.
+        :return: Buy price.
+        """
         return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
             self.symbol
         ).ask
 
-    def get_sell_price(self):
+    def get_sell_price(self) -> float:
+        """
+        Get sell price.
+        :return: Sell price.
+        """
         return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
             self.symbol
         ).bid
@@ -101,7 +114,7 @@ class Controller:
         return self.__send_to_metatrader(request)
 
     @staticmethod
-    def get_balance() -> decimal.Decimal:
+    def get_balance() -> float:
         """
         Get balance of the account.
 
@@ -205,8 +218,12 @@ class Controller:
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
                 return result
+            elif result.retcode == MetaTrader5.TRADE_RETCODE_NO_MONEY:
+                raise BalanceException(
+                    "Not enough money to open position"
+                )
             last_result = result
-        raise ValueError(f"Error {last_result.comment}")
+        raise UnknownException(f"Error: {last_result.comment}")
 
     # def lot(self) -> float:
     #     """Calculate lot"""
