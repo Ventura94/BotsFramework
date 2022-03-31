@@ -4,6 +4,7 @@ Strategy Module. Contain the abstract class Strategy, to implement strategy bots
 
 from abc import ABC, abstractmethod
 from MT5BotsFramework.core.controller import Controller  # pylint: disable=import-error
+from MT5BotsFramework.models.data_models import DataRequest
 
 
 class BotStrategy(ABC):
@@ -12,8 +13,12 @@ class BotStrategy(ABC):
     """
 
     def __init__(self):
-        self.controller = Controller()
+        self.controller = Controller(self.data_request)
 
+    @abstractmethod
+    @property
+    def initial_data(self) -> DataRequest:
+        ...
 
     @staticmethod
     @abstractmethod

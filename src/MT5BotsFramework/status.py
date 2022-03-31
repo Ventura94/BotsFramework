@@ -25,6 +25,7 @@ class Status(metaclass=StatusMeta):
     """
     Status class.
     """
+
     account: int = None
     password: str = None
     server: str = None

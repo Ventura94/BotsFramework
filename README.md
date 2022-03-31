@@ -6,7 +6,7 @@
 
 ### Para instalar:
 
-```python
+```bash
 python setup.py install
 ```
 
@@ -14,6 +14,12 @@ Después de instalar se puede borrar el directorio raíz
 
 Se importa en el script de python de la siguiente forma
 
-````
-from MT5BotFramework.core import ...
-````
+```python
+from MT5BotsFramework.templates.bot_strategy import BotStrategy
+
+
+class SMA(BotStrategy):
+    pass
+
+
+```

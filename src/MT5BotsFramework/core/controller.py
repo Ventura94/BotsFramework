@@ -14,8 +14,9 @@ from MT5BotsFramework.exceptions.mt5_errors import (
     PositionException,
     InitializeException,
     BalanceException,
-    UnknownException
+    UnknownException,
 )
+from MT5BotsFramework.models.data_models import DataRequest
 
 
 class Controller:
@@ -23,17 +24,7 @@ class Controller:
     Controller MetaTrader5 bot class.
     """
 
-    action = MetaTrader5.TRADE_ACTION_DEAL
-    order_type = None
-    symbol = None
-    volume = 0.01
-    sl = None
-    tp = None
-    deviation = 20
-    magic = 0
-    comment = "V3N2R4"
-
-    def __init__(self) -> None:
+    def __init__(self, initial_data: DataRequest) -> None:
         if not MetaTrader5.initialize(  # pylint: disable=maybe-no-member
                 login=Status().account,
                 password=Status().password,
@@ -41,22 +32,7 @@ class Controller:
         ):
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeException(MetaTrader5.last_error())
-
-    def order_type_define(self, order_type: Literal["buy", "sell"]) -> None:
-        """
-        Define type order.
-        :param order_type: Buy or Sell
-        :return: None
-        """
-        order_type = order_type.lower()
-        if order_type == "buy":
-            self.order_type = MetaTrader5.ORDER_TYPE_BUY
-        elif order_type == "sell":
-            self.order_type = MetaTrader5.ORDER_TYPE_SELL
-        else:
-            raise ValueError(
-                'The type of order sent is not accepted, it must be "buy" or "sell"'
-            )
+        self.initial_data = initial_data
 
     def get_buy_price(self) -> float:
         """
@@ -64,7 +40,7 @@ class Controller:
         :return: Buy price.
         """
         return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-            self.symbol
+            self.initial_data.symbol
         ).ask
 
     def get_sell_price(self) -> float:
@@ -73,44 +49,26 @@ class Controller:
         :return: Sell price.
         """
         return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-            self.symbol
+            self.initial_data.symbol
         ).bid
 
-    def __prepare_to_open_positions(
-            self,
-    ) -> Dict[str, Union[str, int, decimal.Decimal]]:
+    def __prepare_to_open_market_positions(
+            self, data_request: DataRequest
+    ) -> Dict[str, Union[str, int, float]]:
         """
         Method that forms the dictionary with which to open position.
         """
-        if self.order_type == MetaTrader5.ORDER_TYPE_BUY:
-            price = self.get_buy_price()
+        if data_request.type == MetaTrader5.ORDER_TYPE_BUY:
+            data_request.price = self.get_buy_price()
         else:
-            price = self.get_sell_price()
-        request = {
-            "action": self.action,
-            "symbol": self.symbol,
-            "volume": self.volume,
-            "type": self.order_type,
-            "price": price,
-            "tp": self.tp,
-            "sl": self.sl,
-            "deviation": self.deviation,
-            "magic": self.magic,
-            "comment": self.comment,
-            "type_time": Status().type_time,
-            "type_filling": Status().type_filling,
-        }
-        if request.get("tp") is None:
-            del request["tp"]
-        if request.get("sl") is None:
-            del request["sl"]
-        return request
+            data_request.price = self.get_sell_price()
+        return data_request.to_dict()
 
-    def open_market_positions(self) -> OrderSendResult:
+    def open_market_positions(self, data_request: DataRequest) -> OrderSendResult:
         """
         Open a position at market price.
         """
-        request = self.__prepare_to_open_positions()
+        request = self.__prepare_to_open_market_positions(data_request)
         return self.__send_to_metatrader(request)
 
     @staticmethod
@@ -124,7 +82,10 @@ class Controller:
             MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
         )
 
-    def __prepare_to_close_positions(self, position: TradePosition) -> dict:
+    @staticmethod
+    def __prepare_to_close_positions(
+            position: TradePosition,
+    ) -> Dict[str, Union[str, float, int]]:
         """
         Method that forms the dictionary with which to close position.
 
@@ -145,15 +106,15 @@ class Controller:
             price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
                 symbol
             ).ask
-        request = {
-            "action": self.action,
-            "symbol": symbol,
-            "position": ticket,
-            "price": price,
-            "volume": volume,
-            "type": order_type,
-        }
-        return request
+
+        return DataRequest(
+            action=MetaTrader5.TRADE_ACTION_DEAL,
+            symbol=symbol,
+            position=ticket,
+            price=price,
+            volume=volume,
+            type=order_type,
+        ).to_dict()
 
     @staticmethod
     def get_position_by_ticket(ticket: int) -> TradePosition:
@@ -184,7 +145,7 @@ class Controller:
         Close all positions of a symbol.
         """
         positions = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            symbol=self.symbol
+            symbol=self.initial_data.symbol
         )
         if positions:
             results = []
@@ -192,9 +153,11 @@ class Controller:
                 request = self.__prepare_to_close_positions(position)
                 results.append(self.__send_to_metatrader(request))
             return results
-        raise PositionException(f" Not found positions for symbol {self.symbol}")
+        raise PositionException(
+            f" Not found positions for symbol {self.initial_data.symbol}"
+        )
 
-    def get_profit_by_ticket(self, ticket: int) -> decimal.Decimal:
+    def get_profit_by_ticket(self, ticket: int) -> float:
         """
         Get profit by ticket.
 
@@ -206,7 +169,7 @@ class Controller:
 
     @staticmethod
     def __send_to_metatrader(
-            request: Dict[str, Union[str, int, decimal.Decimal]]
+            request: Dict[str, Union[str, int, float]]
     ) -> OrderSendResult:
         """
         Send order to metatrader.
@@ -219,9 +182,7 @@ class Controller:
             if result.retcode == MetaTrader5.TRADE_RETCODE_DONE:
                 return result
             elif result.retcode == MetaTrader5.TRADE_RETCODE_NO_MONEY:
-                raise BalanceException(
-                    "Not enough money to open position"
-                )
+                raise BalanceException("Not enough money to open position")
             last_result = result
         raise UnknownException(f"Error: {last_result.comment}")
 
