@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from inspect import signature
 from typing import Dict, Union
 from MT5BotsFramework.tools.clean_data import clean_data_to_dict
 
@@ -19,6 +20,5 @@ class DataRequest:
     type_filling: int = None
     position: int = None
 
-    @classmethod
-    def to_dict(cls) -> Dict[str, Union[str, float, int]]:
-        return clean_data_to_dict(cls)
+    def clean_dict(self) -> Dict[str, Union[str, float, int]]:
+        return clean_data_to_dict(self)

@@ -48,6 +48,7 @@ class Controller:
         Get sell price.
         :return: Sell price.
         """
+
         return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
             self.initial_data.symbol
         ).bid
@@ -62,7 +63,8 @@ class Controller:
             data_request.price = self.get_buy_price()
         else:
             data_request.price = self.get_sell_price()
-        return data_request.to_dict()
+        data_request.action = MetaTrader5.TRADE_ACTION_DEAL
+        return data_request.clean_dict()
 
     def open_market_positions(self, data_request: DataRequest) -> OrderSendResult:
         """
@@ -114,7 +116,7 @@ class Controller:
             price=price,
             volume=volume,
             type=order_type,
-        ).to_dict()
+        ).clean_dict()
 
     @staticmethod
     def get_position_by_ticket(ticket: int) -> TradePosition:

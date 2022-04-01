@@ -12,13 +12,8 @@ class BotStrategy(ABC):
     Abstract class for strategy bot.
     """
 
-    def __init__(self):
-        self.controller = Controller(self.data_request)
-
-    @abstractmethod
-    @property
-    def initial_data(self) -> DataRequest:
-        ...
+    def __init__(self, initial_data: DataRequest):
+        self.controller = Controller(initial_data)
 
     @staticmethod
     @abstractmethod
