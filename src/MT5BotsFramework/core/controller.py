@@ -2,8 +2,9 @@
  MetaTrader5 controller module.
 """
 
-import decimal
-from typing import List, Dict, Union, Literal
+import time
+import threading
+from typing import List, Dict, Union
 import MetaTrader5
 from MetaTrader5 import (  # pylint: disable=no-name-in-module
     TradePosition,
@@ -66,6 +67,45 @@ class Controller:
         data_request.action = MetaTrader5.TRADE_ACTION_DEAL
         return data_request.clean_dict()
 
+    def get_point(self) -> float:
+        return MetaTrader5.symbol_info(self.initial_data.symbol).point
+
+    @staticmethod
+    def __prepare_upgrade_sl(ticket: int, sl: float) -> Dict[str, Union[int, float]]:
+        return DataRequest(action=MetaTrader5.TRADE_ACTION_SLTP,
+                           position=ticket,
+                           sl=sl
+                           ).clean_dict()
+
+    def upgrade_stop_lost(self, ticket: int, sl: float) -> OrderSendResult:
+        request = self.__prepare_upgrade_sl(ticket=ticket, sl=sl)
+        return self.__send_to_metatrader(request)
+
+    def trailing_stop(self, ticket: int, sl_dif: int) -> None:
+        threading.Thread(target=self.__trailing_stop, args=(ticket, sl_dif)).start()
+
+    def __trailing_stop(self, ticket: int, sl_dif: int) -> None:
+        """
+        Trailing stop.
+        """
+        try:
+            position = self.get_position_by_ticket(ticket)
+            last_sl_used = 0
+            while True:
+                if position.type == MetaTrader5.ORDER_TYPE_BUY:
+                    sl = self.get_buy_price() - sl_dif * self.get_point()
+                    if sl > last_sl_used:
+                        last_sl_used = sl
+                        self.upgrade_stop_lost(ticket=ticket, sl=sl)
+                else:
+                    sl = self.get_buy_price() + sl_dif * self.get_point()
+                    if sl > last_sl_used:
+                        last_sl_used = sl
+                        self.upgrade_stop_lost(ticket=ticket, sl=sl)
+                time.sleep(5)
+        except PositionException:
+            pass
+
     def open_market_positions(self, data_request: DataRequest) -> OrderSendResult:
         """
         Open a position at market price.
@@ -84,10 +124,9 @@ class Controller:
             MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
         )
 
-    @staticmethod
-    def __prepare_to_close_positions(
-            position: TradePosition,
-    ) -> Dict[str, Union[str, float, int]]:
+    def __prepare_to_close_positions(self,
+                                     position: TradePosition,
+                                     ) -> Dict[str, Union[str, float, int]]:
         """
         Method that forms the dictionary with which to close position.
 
@@ -100,15 +139,10 @@ class Controller:
         symbol = position.symbol
         if position.type == MetaTrader5.ORDER_TYPE_BUY:
             order_type = MetaTrader5.ORDER_TYPE_SELL
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                symbol
-            ).bid
+            price = self.get_sell_price()
         else:
             order_type = MetaTrader5.ORDER_TYPE_BUY
-            price = MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-                symbol
-            ).ask
-
+            price = self.get_buy_price()
         return DataRequest(
             action=MetaTrader5.TRADE_ACTION_DEAL,
             symbol=symbol,
@@ -132,7 +166,7 @@ class Controller:
             return position[0]
         raise PositionException("Position not found")
 
-    def close_positions_by_ticket(self, ticket: int) -> str:
+    def close_positions_by_ticket(self, ticket: int) -> OrderSendResult:
         """
         Close a position for your ticket.
 
