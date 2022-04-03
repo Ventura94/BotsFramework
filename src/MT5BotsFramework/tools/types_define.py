@@ -3,7 +3,9 @@ import MetaTrader5
 from MT5BotsFramework.models.data_models import DataRequest
 
 
-def order_type_define(order_type: Literal["buy", "sell"], data_request: DataRequest) -> DataRequest:
+def order_type_define(
+    order_type: Literal["buy", "sell"], data_request: DataRequest
+) -> DataRequest:
     """
     Define type order.
     :param order_type: Buy or Sell

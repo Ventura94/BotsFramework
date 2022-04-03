@@ -18,6 +18,7 @@ from MT5BotsFramework.exceptions.mt5_errors import (
     UnknownException,
 )
 from MT5BotsFramework.models.data_models import DataRequest
+from MT5BotsFramework.tools.pip_calculator import price_vs_profit
 
 
 class Controller:
@@ -67,24 +68,38 @@ class Controller:
         data_request.action = MetaTrader5.TRADE_ACTION_DEAL
         return data_request.clean_dict()
 
-    def get_point(self) -> float:
+    def get_symbol_point(self) -> float:
         return MetaTrader5.symbol_info(self.initial_data.symbol).point
+
+    def get_symbol_contract_size(self):
+        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_contract_size
+
+    def get_tick_value(self):
+        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_tick_value
+
+    def get_tick_size(self):
+        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_tick_size
+
+    def get_leverage(self):
+        return MetaTrader5.account_info().leverage
+
+    def get_account_profit(self):
+        return MetaTrader5.MetaTrader5.account_info().profit
 
     @staticmethod
     def __prepare_upgrade_sl(ticket: int, sl: float) -> Dict[str, Union[int, float]]:
-        return DataRequest(action=MetaTrader5.TRADE_ACTION_SLTP,
-                           position=ticket,
-                           sl=sl
-                           ).clean_dict()
+        return DataRequest(
+            action=MetaTrader5.TRADE_ACTION_SLTP, position=ticket, sl=sl
+        ).clean_dict()
 
     def upgrade_stop_lost(self, ticket: int, sl: float) -> OrderSendResult:
         request = self.__prepare_upgrade_sl(ticket=ticket, sl=sl)
         return self.__send_to_metatrader(request)
 
-    def trailing_stop(self, ticket: int, sl_dif: int) -> None:
-        threading.Thread(target=self.__trailing_stop, args=(ticket, sl_dif)).start()
+    def trailing_stop(self, ticket: int, points: float) -> None:
+        threading.Thread(target=self.__trailing_stop, args=(ticket, points)).start()
 
-    def __trailing_stop(self, ticket: int, sl_dif: int) -> None:
+    def __trailing_stop(self, ticket: int, points: float) -> None:
         """
         Trailing stop.
         """
@@ -93,17 +108,19 @@ class Controller:
             last_sl_used = 0
             while True:
                 if position.type == MetaTrader5.ORDER_TYPE_BUY:
-                    sl = self.get_buy_price() - sl_dif * self.get_point()
-                    if sl > last_sl_used:
+                    sl = self.get_buy_price() - points * self.get_symbol_point()
+                    if sl > last_sl_used or last_sl_used == 0:
                         last_sl_used = sl
                         self.upgrade_stop_lost(ticket=ticket, sl=sl)
                 else:
-                    sl = self.get_buy_price() + sl_dif * self.get_point()
-                    if sl > last_sl_used:
+                    sl = self.get_buy_price() + points * self.get_symbol_point()
+                    if sl < last_sl_used or last_sl_used == 0:
                         last_sl_used = sl
                         self.upgrade_stop_lost(ticket=ticket, sl=sl)
                 time.sleep(5)
         except PositionException:
+            pass
+        except UnknownException:
             pass
 
     def open_market_positions(self, data_request: DataRequest) -> OrderSendResult:
@@ -124,9 +141,10 @@ class Controller:
             MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
         )
 
-    def __prepare_to_close_positions(self,
-                                     position: TradePosition,
-                                     ) -> Dict[str, Union[str, float, int]]:
+    def __prepare_to_close_positions(
+            self,
+            position: TradePosition,
+    ) -> Dict[str, Union[str, float, int]]:
         """
         Method that forms the dictionary with which to close position.
 
