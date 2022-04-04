@@ -18,7 +18,6 @@ from MT5BotsFramework.exceptions.mt5_errors import (
     UnknownException,
 )
 from MT5BotsFramework.models.data_models import DataRequest
-from MT5BotsFramework.tools.pip_calculator import price_vs_profit
 
 
 class Controller:
