@@ -107,20 +107,21 @@ class Controller:
             position = self.get_position_by_ticket(ticket)
             last_sl_used = 0
             while True:
-                if position.type == MetaTrader5.ORDER_TYPE_BUY:
-                    sl = self.get_buy_price() - points * self.get_symbol_point()
-                    if sl > last_sl_used or last_sl_used == 0:
-                        last_sl_used = sl
-                        self.upgrade_stop_lost(ticket=ticket, sl=sl)
-                else:
-                    sl = self.get_buy_price() + points * self.get_symbol_point()
-                    if sl < last_sl_used or last_sl_used == 0:
-                        last_sl_used = sl
-                        self.upgrade_stop_lost(ticket=ticket, sl=sl)
-                time.sleep(5)
+                try:
+                    if position.type == MetaTrader5.ORDER_TYPE_BUY:
+                        sl = self.get_buy_price() - points * self.get_symbol_point()
+                        if sl > last_sl_used or last_sl_used == 0:
+                            last_sl_used = sl
+                            self.upgrade_stop_lost(ticket=ticket, sl=sl)
+                    else:
+                        sl = self.get_buy_price() + points * self.get_symbol_point()
+                        if sl < last_sl_used or last_sl_used == 0:
+                            last_sl_used = sl
+                            self.upgrade_stop_lost(ticket=ticket, sl=sl)
+                    time.sleep(5)
+                except UnknownException:
+                    pass
         except PositionException:
-            pass
-        except UnknownException:
             pass
 
     def open_market_positions(self, data_request: DataRequest) -> OrderSendResult:
