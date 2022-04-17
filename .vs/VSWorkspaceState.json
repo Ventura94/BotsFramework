@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\MT5BotsFramework",
+    "\\src\\MT5BotsFramework\\core",
+    "\\src\\MT5BotsFramework\\models",
+    "\\src\\MT5BotsFramework\\templates"
+  ],
+  "SelectedNode": "\\src\\MT5BotsFramework\\core\\controller.py",
+  "PreviewInSolutionExplorer": false
+}

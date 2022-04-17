@@ -2,6 +2,7 @@
  MetaTrader5 controller module.
 """
 
+
 import time
 import threading
 from typing import List, Dict, Union
@@ -27,35 +28,22 @@ class Controller:
 
     def __init__(self, initial_data: DataRequest) -> None:
         if not MetaTrader5.initialize(  # pylint: disable=maybe-no-member
-                login=Status().account,
-                password=Status().password,
-                server=Status().server,
+            login=Status().account,
+            password=Status().password,
+            server=Status().server,
         ):
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
             raise InitializeException(MetaTrader5.last_error())
         self.initial_data = initial_data
 
-    def get_buy_price(self) -> float:
-        """
-        Get buy price.
-        :return: Buy price.
-        """
-        return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-            self.initial_data.symbol
-        ).ask
+    
+        
 
-    def get_sell_price(self) -> float:
-        """
-        Get sell price.
-        :return: Sell price.
-        """
-
-        return MetaTrader5.symbol_info_tick(  # pylint: disable=maybe-no-member
-            self.initial_data.symbol
-        ).bid
+    
+        
 
     def __prepare_to_open_market_positions(
-            self, data_request: DataRequest
+        self, data_request: DataRequest
     ) -> Dict[str, Union[str, int, float]]:
         """
         Method that forms the dictionary with which to open position.
@@ -65,25 +53,8 @@ class Controller:
         else:
             data_request.price = self.get_sell_price()
         data_request.action = MetaTrader5.TRADE_ACTION_DEAL
-        return data_request.clean_dict()
-
-    def get_symbol_point(self) -> float:
-        return MetaTrader5.symbol_info(self.initial_data.symbol).point
-
-    def get_symbol_contract_size(self):
-        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_contract_size
-
-    def get_tick_value(self):
-        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_tick_value
-
-    def get_tick_size(self):
-        return MetaTrader5.symbol_info(self.initial_data.symbol).trade_tick_size
-
-    def get_leverage(self):
-        return MetaTrader5.account_info().leverage
-
-    def get_account_profit(self):
-        return MetaTrader5.MetaTrader5.account_info().profit
+        return data_request.clean_dict()        
+    
 
     @staticmethod
     def __prepare_upgrade_sl(ticket: int, sl: float) -> Dict[str, Union[int, float]]:
@@ -130,20 +101,11 @@ class Controller:
         request = self.__prepare_to_open_market_positions(data_request)
         return self.__send_to_metatrader(request)
 
-    @staticmethod
-    def get_balance() -> float:
-        """
-        Get balance of the account.
-
-        :return: Balance of the account.
-        """
-        return (
-            MetaTrader5.MetaTrader5.account_info().balance  # pylint: disable=maybe-no-member
-        )
+    
 
     def __prepare_to_close_positions(
-            self,
-            position: TradePosition,
+        self,
+        position: TradePosition,
     ) -> Dict[str, Union[str, float, int]]:
         """
         Method that forms the dictionary with which to close position.
@@ -223,13 +185,9 @@ class Controller:
 
     @staticmethod
     def __send_to_metatrader(
-            request: Dict[str, Union[str, int, float]]
+        request: Dict[str, Union[str, int, float]]
     ) -> OrderSendResult:
-        """
-        Send order to metatrader.
-
-        :param dict request: Request data to metatrader.
-        """
+        
         last_result = None
         for _ in range(3):
             result = MetaTrader5.order_send(request)  # pylint: disable=maybe-no-member
