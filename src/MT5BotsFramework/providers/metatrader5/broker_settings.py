@@ -1,13 +1,13 @@
 """
-Status module.
+Broker Settings
 """
 from threading import Lock
 import MetaTrader5
 
 
-class StatusMeta(type):
+class BrokerSettingsMeta(type):
     """
-    Status metaclass, necessary for the Singleton Pattern Design.
+    Broker Settings metaclass.
     """
 
     _instances = {}
@@ -21,9 +21,9 @@ class StatusMeta(type):
         return cls._instances[cls]
 
 
-class Status(metaclass=StatusMeta):
+class BrokerSettings(metaclass=BrokerSettingsMeta):
     """
-    Status class.
+    Broker Settings class.
     """
 
     account: int = None

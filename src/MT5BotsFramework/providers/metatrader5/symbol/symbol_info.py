@@ -6,6 +6,9 @@ from MT5BotsFramework.interfaces.isymbol_info import ISymbolInfo
 
 
 class SymbolInfo(ISymbolInfo):
+    """
+    Symbol info class for MetaTrader5
+    """
 
     symbol: str = None
 

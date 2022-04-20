@@ -13,7 +13,11 @@ class IAccountInfo(ABC):
     @property
     @abstractmethod
     def leverage(self):
-        ...
+        """
+        Get Laverage of the account.
+
+        :return: Laverage of the account
+        """
 
     @property
     @abstractmethod

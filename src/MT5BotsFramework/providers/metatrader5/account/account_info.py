@@ -1,5 +1,5 @@
 """
-Module account info class for MetaTrader5 
+Module account info class for MetaTrader5
 """
 import MetaTrader5
 from MT5BotsFramework.interfaces.iaccount_info import IAccountInfo
