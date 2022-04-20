@@ -3,7 +3,7 @@ This module performs copy trading with telegram messages.
 """
 
 from abc import ABC, abstractmethod
-from MT5BotsFramework.core.controller import Controller  # pylint: disable=import-error
+from MT5BotsFramework.interfaces.iservice import IService
 
 
 class TelegramCopyProvider(ABC):
@@ -11,8 +11,15 @@ class TelegramCopyProvider(ABC):
     Bot Telegram copy trading.
     """
 
-    def __init__(self):
-        self.controller = Controller()
+    account_info: IAccountInfo = None
+    position: IPosition = None
+    symbol_info: ISymbolInfo = None
+
+    def __init__(self, provider: IService) -> None:
+        service = provider()
+        self.position = service.position
+        self.account_info = service.account_info
+        self.symbol_info = service.symbol_info
 
     @staticmethod
     @abstractmethod

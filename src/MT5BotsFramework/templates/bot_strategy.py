@@ -1,10 +1,10 @@
 """
 Strategy Module. Contain the abstract class Strategy, to implement strategy bots.
 """
-
+from typing import Literal
 from abc import ABC, abstractmethod
-from MT5BotsFramework.core.controller import Controller  # pylint: disable=import-error
-from MT5BotsFramework.models.data_models import DataRequest
+from MT5BotsFramework.interfaces.iservice import IService
+from MT5BotsFramework.providers.adapter import AdapterProvider
 
 
 class BotStrategy(ABC):
@@ -12,8 +12,15 @@ class BotStrategy(ABC):
     Abstract class for strategy bot.
     """
 
-    def __init__(self, initial_data: DataRequest):
-        self.controller = Controller(initial_data)
+    account_info: IAccountInfo = None
+    position: IPosition = None
+    symbol_info: ISymbolInfo = None
+
+    def __init__(self, provider: IService) -> None:
+        service = provider()
+        self.position = service.position
+        self.account_info = service.account_info
+        self.symbol_info = service.symbol_info
 
     @staticmethod
     @abstractmethod

@@ -1,6 +1,10 @@
 from dataclasses import dataclass
-from typing import Dict, Union, get_type_hints
+from typing import Dict, Union
 from MT5BotsFramework.utils.clean_data import clean_data_to_dict
+from MT5BotsFramework.providers.metatrader5.exceptions import (
+    BalanceException,
+    UnknownException,
+)
 from MetaTrader5 import OrderSendResult
 import MetaTrader5
 

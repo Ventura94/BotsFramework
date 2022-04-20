@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class ISymbolInfo(ABC):
-        
-    def __init__(self, symbol:str) -> None:
-        self.symbol = symbol   
-    
+    def __init__(self, symbol: str) -> None:
+        self.symbol = symbol
+
     @property
     @abstractmethod
     def ask(self) -> float:
@@ -28,16 +27,15 @@ class ISymbolInfo(ABC):
 
     @property
     @abstractmethod
-    def symbol_contract_size(self)->float:
+    def symbol_contract_size(self) -> float:
         ...
-    
+
     @property
     @abstractmethod
-    def tick_value(self)->float:
+    def tick_value(self) -> float:
         ...
-        
+
     @property
     @abstractmethod
-    def tick_size(self)->float:
+    def tick_size(self) -> float:
         ...
-    

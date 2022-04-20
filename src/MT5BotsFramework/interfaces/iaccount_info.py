@@ -1,23 +1,21 @@
-
 from abc import ABC, abstractmethod
 
-class IAccountInfo(ABC):
 
+class IAccountInfo(ABC):
     @property
     @abstractmethod
     def leverage(self):
         ...
-    
+
     @property
     @abstractmethod
-    def profit(self)->float:
+    def profit(self) -> float:
         """
         Get profit of the account.
 
         :return: Profit of the account.
-        """  
-        
-    
+        """
+
     @property
     @abstractmethod
     def balance(self) -> float:
@@ -26,7 +24,3 @@ class IAccountInfo(ABC):
 
         :return: Balance of the account.
         """
-        
-
-
-

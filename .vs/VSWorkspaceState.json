@@ -4,9 +4,9 @@
     "\\src",
     "\\src\\MT5BotsFramework",
     "\\src\\MT5BotsFramework\\core",
-    "\\src\\MT5BotsFramework\\models",
-    "\\src\\MT5BotsFramework\\templates"
+    "\\src\\MT5BotsFramework\\interfaces",
+    "\\src\\MT5BotsFramework\\utils"
   ],
-  "SelectedNode": "\\src\\MT5BotsFramework\\core\\controller.py",
+  "SelectedNode": "\\src\\MT5BotsFramework\\interfaces\\iaccount_info.py",
   "PreviewInSolutionExplorer": false
 }

@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4341efaa-d108-445f-b1d4-8ffeb78683b4}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>setup.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="requirements-dev.txt" />
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="build\lib\MT5BotsFramework\core\controller.py" />
+    <Compile Include="build\lib\MT5BotsFramework\core\__init__.py" />
+    <Compile Include="build\lib\MT5BotsFramework\exceptions\mt5_errors.py" />
+    <Compile Include="build\lib\MT5BotsFramework\exceptions\__init__.py" />
+    <Compile Include="build\lib\MT5BotsFramework\models\data_models.py" />
+    <Compile Include="build\lib\MT5BotsFramework\models\__init__.py" />
+    <Compile Include="build\lib\MT5BotsFramework\status.py" />
+    <Compile Include="build\lib\MT5BotsFramework\templates\bot_strategy.py" />
+    <Compile Include="build\lib\MT5BotsFramework\templates\telegram_copy.py" />
+    <Compile Include="build\lib\MT5BotsFramework\templates\__init__.py" />
+    <Compile Include="build\lib\MT5BotsFramework\tools\clean_data.py" />
+    <Compile Include="build\lib\MT5BotsFramework\tools\pip_calculator.py" />
+    <Compile Include="build\lib\MT5BotsFramework\tools\types_define.py" />
+    <Compile Include="build\lib\MT5BotsFramework\tools\__init__.py" />
+    <Compile Include="build\lib\MT5BotsFramework\__init__.py" />
+    <Compile Include="setup.py" />
+    <Compile Include="src\MT5BotsFramework\core\controller.py" />
+    <Compile Include="src\MT5BotsFramework\core\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\interfaces\iaccount_info.py" />
+    <Compile Include="src\MT5BotsFramework\interfaces\iposition.py" />
+    <Compile Include="src\MT5BotsFramework\interfaces\iservice.py" />
+    <Compile Include="src\MT5BotsFramework\interfaces\isymbol_info.py" />
+    <Compile Include="src\MT5BotsFramework\interfaces\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\account\account_info.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\account\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\data_models\data_request.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\data_models\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\exceptions.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\position\position.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\position\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\service.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\symbol\symbol_info.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\symbol\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\metatrader5\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\providers\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\status.py" />
+    <Compile Include="src\MT5BotsFramework\templates\bot_strategy.py" />
+    <Compile Include="src\MT5BotsFramework\templates\telegram_copy.py" />
+    <Compile Include="src\MT5BotsFramework\templates\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\utils\clean_data.py" />
+    <Compile Include="src\MT5BotsFramework\utils\pip_calculator.py" />
+    <Compile Include="src\MT5BotsFramework\utils\types_define.py" />
+    <Compile Include="src\MT5BotsFramework\utils\__init__.py" />
+    <Compile Include="src\MT5BotsFramework\__init__.py" />
+    <Compile Include="tests\test_controller.py" />
+    <Compile Include="tests\test_status.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build\" />
+    <Folder Include="build\lib\" />
+    <Folder Include="build\lib\MT5BotsFramework" />
+    <Folder Include="build\lib\MT5BotsFramework\core" />
+    <Folder Include="build\lib\MT5BotsFramework\exceptions" />
+    <Folder Include="build\lib\MT5BotsFramework\models" />
+    <Folder Include="build\lib\MT5BotsFramework\templates" />
+    <Folder Include="build\lib\MT5BotsFramework\tools" />
+    <Folder Include="src\" />
+    <Folder Include="src\MT5BotsFramework" />
+    <Folder Include="src\MT5BotsFramework\core" />
+    <Folder Include="src\MT5BotsFramework\interfaces" />
+    <Folder Include="src\MT5BotsFramework\providers\" />
+    <Folder Include="src\MT5BotsFramework\providers\metatrader5" />
+    <Folder Include="src\MT5BotsFramework\providers\metatrader5\account" />
+    <Folder Include="src\MT5BotsFramework\providers\metatrader5\data_models" />
+    <Folder Include="src\MT5BotsFramework\providers\metatrader5\position\" />
+    <Folder Include="src\MT5BotsFramework\providers\metatrader5\symbol" />
+    <Folder Include="src\MT5BotsFramework\templates" />
+    <Folder Include="src\MT5BotsFramework\utils" />
+    <Folder Include="tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="venv\">
+      <Id>venv</Id>
+      <Description>venv (Python 3.9 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <Version>3.9</Version>
+      <Architecture>X64</Architecture>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+    </Interpreter>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
