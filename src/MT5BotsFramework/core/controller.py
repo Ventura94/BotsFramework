@@ -7,8 +7,7 @@ import threading
 from typing import List, Dict, Union
 import MetaTrader5
 from MetaTrader5 import (  # pylint: disable=no-name-in-module
-    TradePosition,
-    OrderSendResult,
+    TradePosition, OrderSendResult,
 )
 from MT5BotsFramework.status import Status
 
@@ -19,17 +18,19 @@ class Controller:
     """
 
     @staticmethod
-    def __prepare_upgrade_sl(ticket: int, sl: float) -> Dict[str, Union[int, float]]:
-        return DataRequest(
-            action=MetaTrader5.TRADE_ACTION_SLTP, position=ticket, sl=sl
-        ).clean_dict()
+    def __prepare_upgrade_sl(ticket: int,
+                             sl: float) -> Dict[str, Union[int, float]]:
+        return DataRequest(action=MetaTrader5.TRADE_ACTION_SLTP,
+                           position=ticket,
+                           sl=sl).clean_dict()
 
     def upgrade_stop_lost(self, ticket: int, sl: float) -> OrderSendResult:
         request = self.__prepare_upgrade_sl(ticket=ticket, sl=sl)
         return self.__send_to_metatrader(request)
 
     def trailing_stop(self, ticket: int, points: float) -> None:
-        threading.Thread(target=self.__trailing_stop, args=(ticket, points)).start()
+        threading.Thread(target=self.__trailing_stop,
+                         args=(ticket, points)).start()
 
     def __trailing_stop(self, ticket: int, points: float) -> None:
         """
@@ -41,12 +42,14 @@ class Controller:
             while True:
                 try:
                     if position.type == MetaTrader5.ORDER_TYPE_BUY:
-                        sl = self.get_buy_price() - points * self.get_symbol_point()
+                        sl = self.get_buy_price(
+                        ) - points * self.get_symbol_point()
                         if sl > last_sl_used or last_sl_used == 0:
                             last_sl_used = sl
                             self.upgrade_stop_lost(ticket=ticket, sl=sl)
                     else:
-                        sl = self.get_buy_price() + points * self.get_symbol_point()
+                        sl = self.get_buy_price(
+                        ) + points * self.get_symbol_point()
                         if sl < last_sl_used or last_sl_used == 0:
                             last_sl_used = sl
                             self.upgrade_stop_lost(ticket=ticket, sl=sl)
@@ -64,8 +67,7 @@ class Controller:
         :return: TradePosition object.
         """
         position = MetaTrader5.positions_get(  # pylint: disable=maybe-no-member
-            ticket=ticket
-        )
+            ticket=ticket)
         if position:
             return position[0]
         raise PositionException("Position not found")

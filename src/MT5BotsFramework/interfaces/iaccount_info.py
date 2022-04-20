@@ -1,7 +1,15 @@
+"""
+Account info interface.
+"""
+
 from abc import ABC, abstractmethod
 
 
 class IAccountInfo(ABC):
+    """
+    This class is the interface for account info.
+    """
+
     @property
     @abstractmethod
     def leverage(self):

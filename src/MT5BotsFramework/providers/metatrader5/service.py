@@ -1,3 +1,6 @@
+"""
+Metatrader Service Module
+"""
 import MetaTrader5
 from MT5BotsFramework.interfaces.iservice import IService
 from MT5BotsFramework.interfaces.iaccount_info import IAccountInfo
@@ -10,13 +13,18 @@ from MT5BotsFramework.providers.metatrader5.exceptions import InitializeExceptio
 
 
 class MetaTraderService(IService):
-    account_info: IAccountInfo = AccountInfo()
-    position: IPosition = Position()
-    symbol_info: ISymbolInfo = SymbolInfo()
+    """
+    Metatrader Service Class
+    """
+    account_info: IAccountInfo = None
+    position: IPosition = None
+    symbol_info: ISymbolInfo = None
 
     def __init__(self) -> None:
         if not MetaTrader5.initialize():  # pylint: disable=maybe-no-member
             MetaTrader5.shutdown()  # pylint: disable=maybe-no-member
-            raise InitializeException(
-                MetaTrader5.last_error()  # pylint: disable=maybe-no-member
-            )
+            raise InitializeException(MetaTrader5.last_error()  # pylint: disable=maybe-no-member
+                                      )
+        self.account_info: IAccountInfo = AccountInfo
+        self.position: IPosition = Position
+        self.symbol_info: ISymbolInfo = SymbolInfo

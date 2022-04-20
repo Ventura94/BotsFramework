@@ -1,8 +1,15 @@
+"""
+Position interface
+"""
 from abc import ABC, abstractmethod
 from typing import Any
 
 
 class IPosition(ABC):
+    """
+    Position Interface Class
+    """
+
     @abstractmethod
     def open_buy_positions(self, symbol: str, leverage: float) -> Any:
         """
@@ -16,7 +23,7 @@ class IPosition(ABC):
         """
 
     @abstractmethod
-    def get_position(self) -> Any:
+    def get_position_by_id(self, position_id: int) -> Any:
         """
         Get position by ticket.
         :param ticket: Ticket of the position.
@@ -24,7 +31,7 @@ class IPosition(ABC):
         """
 
     @abstractmethod
-    def close_positions(self) -> Any:
+    def close_positions_by_id(self, position_id: int) -> Any:
         """
         Close a position for your ticket.
 
@@ -32,7 +39,7 @@ class IPosition(ABC):
         """
 
     @abstractmethod
-    def close_positions_by_symbol(self) -> Any:
+    def close_positions_by_symbol(self, symbol: str) -> Any:
         """
         Close all positions of a symbol.
         """
