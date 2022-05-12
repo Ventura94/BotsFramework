@@ -6,9 +6,6 @@ from typing import Any
 
 
 class IPosition(ABC):
-    """
-    Position Interface Class
-    """
 
     @abstractmethod
     def open_buy_positions(self, symbol: str, leverage: float) -> Any:
@@ -25,17 +22,13 @@ class IPosition(ABC):
     @abstractmethod
     def get_position_by_id(self, position_id: int) -> Any:
         """
-        Get position by ticket.
-        :param ticket: Ticket of the position.
-        :return: TradePosition object.
+        Return position by ticket.
         """
 
     @abstractmethod
     def close_positions_by_id(self, position_id: int) -> Any:
         """
-        Close a position for your ticket.
-
-        :return: Closing result.
+        Close a position for ticket.
         """
 
     @abstractmethod
