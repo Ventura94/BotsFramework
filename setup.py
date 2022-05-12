@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="MT5BotsFramework",
+    name="BotsFramework",
     version="0.1.0",
     author="Arian Ventura Rodríguez",
     author_email="arianventura94@gmail.com",
