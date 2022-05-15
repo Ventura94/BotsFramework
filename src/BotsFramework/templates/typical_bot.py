@@ -1,6 +1,3 @@
-"""
-Abstract class Strategy, to implement strategy bots.
-"""
 from BotsFramework.interfaces.iservice import IService
 from BotsFramework.interfaces.providers.iposition import IPosition
 from BotsFramework.interfaces.providers.isymbol_info import ISymbolInfo
