@@ -6,7 +6,6 @@ from typing import Any
 
 
 class IPosition(ABC):
-
     @abstractmethod
     def open_buy_positions(self, symbol: str, leverage: float) -> Any:
         """

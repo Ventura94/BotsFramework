@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 
 
 class IAccountInfo(ABC):
-
     @property
     @abstractmethod
     def leverage(self):
