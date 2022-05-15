@@ -1,7 +1,0 @@
-coverage
-pylint
-pytest
-pytest-mock
-pytest-cov
-mypy
-black

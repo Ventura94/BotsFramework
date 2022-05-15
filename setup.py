@@ -15,9 +15,9 @@ setuptools.setup(
     description="Bots Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ventura94/BotFramework",
+    url="https://github.com/ventura94/BotsFramework",
     project_urls={
-        "Bug Tracker": "https://github.com/ventura94/BotFramework/issues",
+        "Bug Tracker": "https://github.com/ventura94/BotsFramework/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -27,5 +27,4 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=["MetaTrader5;platform_system=='Windows'"],
 )
