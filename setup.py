@@ -12,12 +12,12 @@ setuptools.setup(
     version="0.1.0",
     author="Arian Ventura Rodríguez",
     author_email="arianventura94@gmail.com",
-    description="MetaTrader5 Bots Framework",
+    description="Bots Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/firagapecoin/MT5BotFramework",
+    url="https://github.com/ventura94/BotFramework",
     project_urls={
-        "Bug Tracker": "https://github.com/firagapecoin/MT5BotFramework/issues",
+        "Bug Tracker": "https://github.com/ventura94/BotFramework/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",

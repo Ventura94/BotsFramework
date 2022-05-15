@@ -1,4 +1,4 @@
-# MT5BotFramework
+# BotsFramework
 
 [![Pylint](https://github.com/firagapecoin/MT5BotFramework/actions/workflows/pylint.yml/badge.svg)](https://github.com/firagapecoin/MT5BotFramework/actions/workflows/pylint.yml)
 [![Black](https://github.com/firagapecoin/MT5BotFramework/actions/workflows/black.yml/badge.svg)](https://github.com/firagapecoin/MT5BotFramework/actions/workflows/black.yml)
